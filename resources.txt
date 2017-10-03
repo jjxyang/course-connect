@@ -11,10 +11,5 @@ https://developers.facebook.com/docs/graph-api/overview
 
 
 
-Experimentation in Facebook’s Graph API
-https://developers.facebook.com/tools/explorer?method=GET&path=1495584763993688&version=v2.10
-
-
-
 Facebook4J: free to use wrapper for Facebook API in Java
 http://facebook4j.github.io/en/index.html
