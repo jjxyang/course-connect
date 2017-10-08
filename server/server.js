@@ -43,7 +43,6 @@ http.createServer(function(request, response) {
     console.log(urlRequest);
   }
 
-
   if (verifyWebpage(urlRequest)){
     console.log("ENTERED FIRST");
     filePath = path.join(__dirname, '..', 'web', urlRequest);
