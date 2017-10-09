@@ -28,23 +28,34 @@ var http = require('http');
 var fs = require("fs");
 var path = require("path");
 
+
+// var express   =     require("express");
+// var app       =     express();
+// app.use(express.static(__dirname + '/css'));
+
+
+
 http.createServer(function(request, response) {
   urlRequest = request.url.toString();
 
-  //Set homepage
-  if(urlRequest === "/"){
-    urlRequest = urlRequest + "index"
-  }
+  // //formatting the url to include ".html" if not there  
+  // if(urlRequest.slice(-5)!==".html"){
+  //   console.log("ENTERED");
+  //   urlRequest = urlRequest + ".html";
+  //   console.log(urlRequest);
+  // }
 
-  //formatting the url to include ".html" if not there  
-  if(urlRequest.slice(-5)!==".html"){
-    console.log("ENTERED");
-    urlRequest = urlRequest + ".html";
-    console.log(urlRequest);
-  }
 
   if (verifyWebpage(urlRequest)){
-    console.log("ENTERED FIRST");
+    //Set homepage at index.html
+    if(urlRequest === "/"){
+      urlRequest = urlRequest + "index.html"
+    }
+
+    //actual code
+    console.log("ENTERED HTML");
+
+
     filePath = path.join(__dirname, '..', 'web', urlRequest);
     console.log(filePath);
     sendFileContent(response, filePath, "text/html");
@@ -55,8 +66,12 @@ http.createServer(function(request, response) {
   Otherwise seems to have three separate calls going on in server.js
   */
   else if(/^\/[a-zA-Z0-9\/]*.js$/.test(request.url.toString())) {
-    console.log("Requested javascript is: " + request.url);
-    sendFileContent(response, request.url.toString().substring(1), "text/javascript");
+    console.log("ENTERED JAVASCRIPT");
+
+
+    filePath = path.join(__dirname, '..', 'web/', urlRequest);
+    console.log(filePath);
+    sendFileContent(response, filePath, "text/javascript");
   }
   /*
   Work on CSS implementation later
@@ -64,8 +79,12 @@ http.createServer(function(request, response) {
   Otherwise seems to have three separate calls going on in server.js
   */
   else if(/^\/[a-zA-Z0-9\/]*.css$/.test(request.url.toString())) {
-    console.log("Requested CSS is: " + request.url);
-    sendFileContent(response, request.url.toString().substring(1), "text/css");
+    console.log("ENTERED CSS");
+    
+
+    filePath = path.join(__dirname, '..', 'web/', urlRequest);
+    console.log(filePath);
+    sendFileContent(response, filePath, "text/css");
   }
   else{
     console.log("Invalid page request... URL: " + request.url);
@@ -103,7 +122,8 @@ function sendFileContent(response, fileName, contentType){
 
 function verifyWebpage(param){
   // console.log("Requested URL is: " + request.url);
-  if(param === "/about.html"
+  if(param === "/"
+    || param === "/about.html"
     || param === "/connect.html"
     || param === "/courses.html"
     || param === "/index.html"
