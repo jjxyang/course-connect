@@ -122,6 +122,8 @@ function verifyWebpage(param){
   if(param === "/"
     || param === "/about.html"
     || param === "/connect.html"
+    || param === "/connect/make-posting.html"
+    || param === "/connect/view-postings.html"
     || param === "/courses.html"
     || param === "/index.html"
     || param === "/login.html"
