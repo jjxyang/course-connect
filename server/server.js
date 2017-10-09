@@ -28,13 +28,6 @@ var http = require('http');
 var fs = require("fs");
 var path = require("path");
 
-
-// var express   =     require("express");
-// var app       =     express();
-// app.use(express.static(__dirname + '/css'));
-
-
-
 http.createServer(function(request, response) {
   urlRequest = request.url.toString();
 
@@ -45,7 +38,6 @@ http.createServer(function(request, response) {
   //   console.log(urlRequest);
   // }
 
-
   if (verifyWebpage(urlRequest)){
     //Set homepage at index.html
     if(urlRequest === "/"){
@@ -54,9 +46,10 @@ http.createServer(function(request, response) {
 
     //actual code
     console.log("ENTERED HTML");
+    console.log("urlRequest: " + urlRequest);
 
 
-    filePath = path.join(__dirname, '..', 'web', urlRequest);
+    filePath = path.join(__dirname, '..', '/web', urlRequest);
     console.log(filePath);
     sendFileContent(response, filePath, "text/html");
   }
@@ -67,9 +60,10 @@ http.createServer(function(request, response) {
   */
   else if(/^\/[a-zA-Z0-9\/]*.js$/.test(request.url.toString())) {
     console.log("ENTERED JAVASCRIPT");
+    console.log("urlRequest: " + urlRequest);
 
 
-    filePath = path.join(__dirname, '..', 'web/', urlRequest);
+    filePath = path.join(__dirname, '..', '/web', urlRequest);
     console.log(filePath);
     sendFileContent(response, filePath, "text/javascript");
   }
@@ -80,9 +74,10 @@ http.createServer(function(request, response) {
   */
   else if(/^\/[a-zA-Z0-9\/]*.css$/.test(request.url.toString())) {
     console.log("ENTERED CSS");
-    
+    console.log("urlRequest: " + urlRequest);
 
-    filePath = path.join(__dirname, '..', 'web/', urlRequest);
+
+    filePath = path.join(__dirname, '..', '/web', urlRequest);
     console.log(filePath);
     sendFileContent(response, filePath, "text/css");
   }
@@ -119,6 +114,9 @@ function sendFileContent(response, fileName, contentType){
   });
 }
 
+/*
+Function ensures that the page is one of several valid paths
+*/
 function verifyWebpage(param){
   // console.log("Requested URL is: " + request.url);
   if(param === "/"
@@ -132,6 +130,12 @@ function verifyWebpage(param){
   }
   return false;
 }
+
+
+//Note: need a function that can detect if login, and then checks the information for the database if it matches
+//if so, that page will need to use oauth with facebook's api
+
+
 
 
 
