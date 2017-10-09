@@ -100,7 +100,6 @@ http.createServer(function(request, response) {
 }).listen(3000);
 
 
-
 /*
 To do: learn how to implement css later
 For now: work on implementing backend
