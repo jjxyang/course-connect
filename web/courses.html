@@ -15,45 +15,66 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="index.html">Course Connect</a>
-      </div>
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId: "126740034652064",
+        autoLogAppEvents : true,
+        cookie: true,
+        status: true,
+        xfbml: true,
+        version: 'v2.10'
+      });
 
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse navbar-ex1-collapse" class="border:transparent">
-        <ul class="nav navbar-nav navbar-left">
-          <li class="active"><a href="courses.html">Courses<span class="sr-only">(current)</span></a></li>
-          <li class="dropdown">
-            <a href="connect.html" class="dropdown-toggle" data-toggle="dropdown" role="button">Connect <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="/connect.html">Connect</a></li>
-                <li><a href="/connect/make-posting.html">Make a Posting</a></li>
-                <li><a href="/connect/view-postings.html">View Postings</a></li>
-              </ul>
-          </li>
-          <li><a href="about.html">About</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right" style="padding-right=50px">
-          <li><a href="login.html">Log In / Sign Up</a></li>
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container -->
-  </nav>
+      FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+      });
+
+      FB.AppEvents.logPageView();
+    };
+
+    // Load the SDK asynchronously
+    (function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=126740034652064";
+      fjs.parentNode.insertBefore(js, fjs);
+    } (document, 'script', 'facebook-jssdk'));
+
+    function statusChangeCallback(response) {
+      console.log('statusChangeCallback');
+      console.log(response);
+
+      if (response.status === 'connected') {
+        // Logged into your app and Facebook.
+        greetCourses();
+      } else {
+        // The person is not logged into your app or we are unable to tell.
+        document.getElementById('status').innerHTML = 'Please log ' +
+          'into this app.';
+      }
+    }
+
+    function greetCourses() {
+      console.log('Welcome!  Fetching your information.... ');
+      FB.api('/me', function(response) {
+        console.log('Successful login for: ' + response.name);
+        document.getElementById('status').innerHTML =
+          'Check out some courses, ' + response.name + '!';
+      });
+    }
+  </script>
+  <div id="fb-root"></div>
+  <div id="cc-navbar"></div>
 
   <div class="page-content-wrapper">
     <div class="container-fluid">
       <!-- TODO: make it so you have to log in first before you can do this -->
       <!-- TODO: make it so these checkboxes stay checked if you submitted once -->
       <!-- TODO: make it so you cannot both have "taken" and "enrolled" in the same courses -->
+        <div id="status">
+        </div>
       <form id="courses-taken-and-enrolled" method = "POST" action="/courses-profile">
         <h3>What courses have you taken?</h3>
         <div style="padding:0px 0px 10px 0px;" class="input-group">
@@ -65,16 +86,6 @@
             <option>CS 61C</option>
           </select>
         </div>
-        <!-- TODO: display the courses selected -->
-
-        <!-- TODO: will we ever need checkboxes again? -->
-        <!-- <div style="padding:0px 0px 10px 0px;" class="input-group">
-          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="ee16a">EE 16A</label></span>
-          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="ee16b">EE 16B</label></span>
-          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="cs61a">CS 61A</label></span>
-          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="cs61b">CS 61B</label></span>
-          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="cs61c">CS 61C</label></span>
-        </div> -->
 
         <h3>What courses are you currently enrolled in?</h3>
         <div style="padding:0px 0px 10px 0px;" class="input-group">
@@ -100,4 +111,9 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <!-- Bootstrap-select -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+  <script>
+    $(document).ready(function(){
+        $('#cc-navbar').load('/components/navigation-bar.html');
+    });
+  </script>
 </body>
