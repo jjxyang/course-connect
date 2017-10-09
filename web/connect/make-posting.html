@@ -1,0 +1,98 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Make a Posting</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Bootstrap-select CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+  <!-- Custom stylesheets -->
+  <link href="../css/basics.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">Course Connect</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse navbar-ex1-collapse" class="border:transparent">
+        <ul class="nav navbar-nav navbar-left">
+          <li><a href="../courses.html">Courses</a></li>
+          <li class="active"><a href="../connect.html">Connect<span class="sr-only">(current)</span></a></li>
+          <li><a href="../about.html">About</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right" style="padding-right=50px">
+          <li><a href="../login.html">Log In / Sign Up</a></li>
+        </ul>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container -->
+  </nav>
+
+  <div class="page-content-wrapper">
+      <div class="container-fluid">
+        <div class="divider"></div>
+        <h3 style="padding-bottom:10px">Make a Posting</h3>
+        <form id="make-posting" method = "POST" action="/make-posting">
+          <!-- TODO: make this a type-and-select-a-specific-course -->
+          <div style="padding:0px 0px 10px 0px;" class="input-group">
+            <span class="input-group-addon" for="select-course"><b>Topic</b></span>
+            <select class="form-control selectpicker" title="Select a course..." id="select-course">
+              <option>EE 16A</option>
+              <option>EE 16B</option>
+              <option>CS 61A</option>
+              <option>CS 61B</option>
+              <option>CS 61C</option>
+              <option>Advice</option>
+            </select>
+          </div>
+
+          <div style="padding:0px 0px 10px 0px;" class="input-group">
+            <span class="input-group-addon"><b>Where</b></span>
+            <input type="text" class="form-control" placeholder="Cory Hall, Soda Hall...">
+          </div>
+
+          <div style="padding:0px 0px 10px 0px;" class="input-group">
+            <span class="input-group-addon"><b>Issue</b></span>
+            <select class="form-control selectpicker" title="Select an issue..." id="select-course">
+              <option>I have a bug</option>
+              <option>I have a homework question</option>
+              <option>I have a project question</option>
+              <option>I have a conceptual question</option>
+              <option>I'm having a hard time</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div style="padding:0px 0px 10px 0px;" class="input-group">
+            <span class="input-group-addon"><b>Details</b></span>
+            <input type="textarea" class="form-control" placeholder="I'm having a specific issue with...">
+          </div>
+
+          <div style="padding-top:20px">
+            <!-- TODO: send a POST request...? -->
+            <input class="btn btn-primary" type="submit" value="Submit">
+          </div>
+        </form>
+      </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- Bootstrap-select -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+</body>
