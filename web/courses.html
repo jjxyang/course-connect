@@ -8,6 +8,8 @@
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Bootstrap-select CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
   <!-- Custom stylesheets -->
   <link href="css/basics.css" rel="stylesheet">
 </head>
@@ -41,12 +43,54 @@
   </nav>
 
   <div class="page-content-wrapper">
-      <div class="container-fluid">
-        <div>Courses!</div>
-      </div>
+    <div class="container-fluid">
+      <!-- TODO: make it so you have to log in first before you can do this -->
+      <!-- TODO: make it so these checkboxes stay checked if you submitted once -->
+      <!-- TODO: make it so you cannot both have "taken" and "enrolled" in the same courses -->
+      <form id="courses-taken-and-enrolled" method = "POST" action="/courses-profile">
+        <h3>What courses have you taken?</h3>
+        <div style="padding:0px 0px 10px 0px;" class="input-group">
+          <select class="selectpicker" multiple title="Select courses..." id="courses-taken">
+            <option>EE 16A</option>
+            <option>EE 16B</option>
+            <option>CS 61A</option>
+            <option>CS 61B</option>
+            <option>CS 61C</option>
+          </select>
+        </div>
+        <!-- TODO: display the courses selected -->
+
+        <!-- TODO: will we ever need checkboxes again? -->
+        <!-- <div style="padding:0px 0px 10px 0px;" class="input-group">
+          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="ee16a">EE 16A</label></span>
+          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="ee16b">EE 16B</label></span>
+          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="cs61a">CS 61A</label></span>
+          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="cs61b">CS 61B</label></span>
+          <span class="input-group-addon"><label class="checkbox-inline"><input type="checkbox" value="cs61c">CS 61C</label></span>
+        </div> -->
+
+        <h3>What courses are you currently enrolled in?</h3>
+        <div style="padding:0px 0px 10px 0px;" class="input-group">
+          <select class="selectpicker" multiple title="Select courses..." id="courses-taken">
+            <option>EE 16A</option>
+            <option>EE 16B</option>
+            <option>CS 61A</option>
+            <option>CS 61B</option>
+            <option>CS 61C</option>
+          </select>
+        </div>
+
+        <div style="padding-top:20px">
+          <!-- TODO: send a POST request...? -->
+          <input class="btn btn-primary" type="submit" value="Submit">
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Bootstrap core JavaScript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- Bootstrap-select -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
 </body>
