@@ -66,40 +66,7 @@
     }
   </script>
   <div id="fb-root"></div>
-
-  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="index.html">Course Connect</a>
-      </div>
-
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div class="collapse navbar-collapse navbar-ex1-collapse" class="border:transparent">
-        <ul class="nav navbar-nav navbar-left">
-          <li class="active"><a href="courses.html">Courses<span class="sr-only">(current)</span></a></li>
-          <li class="dropdown">
-            <a href="connect.html" class="dropdown-toggle" data-toggle="dropdown" role="button">Connect <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="/connect.html">Connect</a></li>
-                <li><a href="/connect/make-posting.html">Make a Posting</a></li>
-                <li><a href="/connect/view-postings.html">View Postings</a></li>
-              </ul>
-          </li>
-          <li><a href="about.html">About</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right" style="padding-right=50px">
-          <li><a href="login.html">Log In / Sign Up</a></li>
-        </ul>
-      </div><!-- /.navbar-collapse -->
-    </div><!-- /.container -->
-  </nav>
+  <div id="cc-navbar"></div>
 
   <div class="page-content-wrapper">
     <div class="container-fluid">
@@ -144,4 +111,9 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <!-- Bootstrap-select -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+  <script>
+    $(document).ready(function(){
+        $('#cc-navbar').load('/components/navigation-bar.html');
+    });
+  </script>
 </body>
