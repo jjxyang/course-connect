@@ -17,7 +17,6 @@
 <body>
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container-fluid">
-      <!-- Brand and toggle get grouped for better mobile display -->
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-ex1-collapse">
           <span class="sr-only">Toggle navigation</span>
@@ -28,11 +27,17 @@
         <a class="navbar-brand" href="../index.html">Course Connect</a>
       </div>
 
-      <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse navbar-ex1-collapse" class="border:transparent">
         <ul class="nav navbar-nav navbar-left">
           <li><a href="/courses.html">Courses</a></li>
-          <li class="active"><a href="/connect.html">Connect<span class="sr-only">(current)</span></a></li>
+          <li class="dropdown active">
+            <a href="connect.html" class="dropdown-toggle" data-toggle="dropdown" role="button">Connect <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="/connect.html">Connect<span class="sr-only">(current)</span></a></li>
+                <li><a href="/connect/make-posting.html">Make a Posting</a></li>
+                <li><a href="/connect/view-postings.html">View Postings</a></li>
+              </ul>
+          </li>
           <li><a href="/about.html">About</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right" style="padding-right=50px">
