@@ -15,57 +15,6 @@
 </head>
 
 <body>
-  <script>
-    window.fbAsyncInit = function() {
-      FB.init({
-        appId: "126740034652064",
-        autoLogAppEvents : true,
-        cookie: true,
-        status: true,
-        xfbml: true,
-        version: 'v2.10'
-      });
-
-      FB.getLoginStatus(function(response) {
-        statusChangeCallback(response);
-      });
-
-      FB.AppEvents.logPageView();
-    };
-
-    // Load the SDK asynchronously
-    (function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.10&appId=126740034652064";
-      fjs.parentNode.insertBefore(js, fjs);
-    } (document, 'script', 'facebook-jssdk'));
-
-    function statusChangeCallback(response) {
-      console.log('statusChangeCallback');
-      console.log(response);
-
-      if (response.status === 'connected') {
-        // Logged into your app and Facebook.
-        greetCourses();
-      } else {
-        // The person is not logged into your app or we are unable to tell.
-        document.getElementById('status').innerHTML = 'Please log ' +
-          'into this app.';
-      }
-    }
-
-    function greetCourses() {
-      console.log('Welcome!  Fetching your information.... ');
-      FB.api('/me', function(response) {
-        console.log('Successful login for: ' + response.name);
-        document.getElementById('status').innerHTML =
-          'Check out some courses, ' + response.name + '!';
-      });
-    }
-  </script>
-  <div id="fb-root"></div>
   <div id="cc-navbar"></div>
 
   <div class="page-content-wrapper">
