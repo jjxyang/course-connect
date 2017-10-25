@@ -1,7 +1,16 @@
-//Note: need a function that can detect if login, and then checks the information for the database if it matches
-//if so, that page will need to use oauth with facebook's api
 
 
+/*
+      >>>>>TO IMPLEMENT<<<<<
+*/
+//A function that can detect if login, and then checks the information for the database if it matches. If so, that page will need to use oauth with facebook's api
+
+/*
+      >>>>>IMPORTS<<<<<
+*/
+var http = require('http');
+var fs = require("fs");
+var path = require("path");
 
 /*
       >>>>>HELPER FUNCTIONS<<<<<
@@ -44,40 +53,11 @@ function verifyWebpage(param){
   return false;
 }
 
-
-
 /*
-you can break js files into modules
-
-if you wanted to move database stuff into own file
-var db = require('db.js')
-
-and you'd have imported the content of db into the server.js module
-
-but if you're trying to update a file, you need to incorporate another requires call that can communicate with it
-eg. require('SQL')
-
-However, if you are implementing a database, you will need to use another backend that communicates to the database
-
-
-//parse and firebase
-//use firebase for figuring out how to create a database module
-//this is another backend that our backend for the website will communicate to
-//you can host your code into the firebase as well
-
-
-Note: if curly braces are not attached to a function then they're an object
+      >>>>>CREATE SERVER<<<<<
 */
-
-
-var http = require('http');
-var fs = require("fs");
-var path = require("path");
-
-
 var webpage = http.createServer(function(request, response) {
   urlRequest = request.url.toString();
-
   // //formatting the url to include ".html" if not there
   // if(urlRequest.slice(-5)!==".html"){
   //   console.log("ENTERED");
@@ -139,17 +119,29 @@ var webpage = http.createServer(function(request, response) {
   }
 })
 
+/*
+      >>>>>LISTEN REQUESTS<<<<<
+*/      
+var io = require('socket.io').listen(app);
+
+io.on('connection', function(socket) {
+    // Use socket to communicate with this particular client only, sending it it's own id
+
+    //what goes on after hearing the event 'make posting'?
+    //not sure what console.log is doing here?
+    //supposed to be accepting an input?
+    //don't see an emit function inside of the client?
+    socket.on('make posting', console.log);
 
 
-
-
-
-
-
-
+});
 
 
 webpage.listen(3000);
+
+
+
+
 
 
 
