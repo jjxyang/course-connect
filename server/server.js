@@ -127,7 +127,8 @@ function verifyWebpage(param){
     || param === "/courses.html"
     || param === "/index.html"
     || param === "/login.html"
-    || param ==="/components/navigation-bar.html"
+    || param === "/components/navigation-bar.html"
+    || param === "/js/connect/make-posting.js"
     ){
     return true;
   }
