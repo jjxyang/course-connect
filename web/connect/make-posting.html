@@ -21,11 +21,13 @@
       <div class="container-fluid">
         <div class="divider"></div>
         <h3 style="padding-bottom:10px">Make a Posting</h3>
-        <form id="make-posting" method = "POST" action="/make-posting">
+        <form id="make-posting" onsubmit="return makePosting()">
           <!-- TODO: make this a type-and-select-a-specific-course -->
           <div style="padding:0px 0px 10px 0px;" class="input-group">
-            <span class="input-group-addon" for="select-course"><b>Topic</b></span>
-            <select class="form-control selectpicker" title="Select a course..." id="select-course">
+            <span class="input-group-addon" for="select-course">
+              <b>Topic <span style="color:red">*</span></b>
+            </span>
+            <select class="form-control selectpicker" title="Select a course..." id="course-selected">
               <option>EE 16A</option>
               <option>EE 16B</option>
               <option>CS 61A</option>
@@ -36,13 +38,17 @@
           </div>
 
           <div style="padding:0px 0px 10px 0px;" class="input-group">
-            <span class="input-group-addon"><b>Where</b></span>
-            <input type="text" class="form-control" placeholder="Cory Hall, Soda Hall...">
+            <span class="input-group-addon">
+              <b>Where <span style="color:red">*</span></b>
+            </span>
+            <input type="text" class="form-control" placeholder="Cory Hall, Soda Hall..." id="location">
           </div>
 
           <div style="padding:0px 0px 10px 0px;" class="input-group">
-            <span class="input-group-addon"><b>Issue</b></span>
-            <select class="form-control selectpicker" title="Select an issue..." id="select-course">
+            <span class="input-group-addon">
+              <b>Issue </b><span style="color:red">*</span>
+            </span>
+            <select class="form-control selectpicker" title="Select an issue..." id="issue-type">
               <option>I have a bug</option>
               <option>I have a homework question</option>
               <option>I have a project question</option>
@@ -54,12 +60,11 @@
 
           <div style="padding:0px 0px 10px 0px;" class="input-group">
             <span class="input-group-addon"><b>Details</b></span>
-            <input type="textarea" class="form-control" placeholder="I'm having a specific issue with...">
+            <input type="textarea" class="form-control" placeholder="I'm having a specific issue with..." id="issue-details"/>
           </div>
 
           <div style="padding-top:20px">
-            <!-- TODO: send a POST request...? -->
-            <input class="btn btn-primary" type="submit" value="Submit">
+            <input class="btn btn-primary" type="submit" value="Submit"/>
           </div>
         </form>
       </div>
@@ -75,4 +80,5 @@
         $('#cc-navbar').load('/components/navigation-bar.html');
     });
   </script>
+  <script type="text/javascript" src="/js/connect/make-posting.js"></script>
 </body>
