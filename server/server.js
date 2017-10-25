@@ -1,3 +1,49 @@
+//Note: need a function that can detect if login, and then checks the information for the database if it matches
+//if so, that page will need to use oauth with facebook's api
+
+
+
+/*
+      >>>>>HELPER FUNCTIONS<<<<<
+*/
+
+// To do: learn how to implement css later
+// For now: work on implementing backend
+function sendFileContent(response, fileName, contentType){
+  fs.readFile(fileName, function(err, data){
+    if(err){
+      response.writeHead(404);
+      response.write("Page not Found!");
+    }
+    else{
+      response.writeHead(200, {'Content-Type': contentType});
+      response.write(data);
+    }
+    response.end();
+  });
+}
+
+// Function ensures that the page is one of several valid paths
+function verifyWebpage(param){
+  // console.log("Requested URL is: " + request.url);
+  if(param === "/"
+    || param === "/about.html"
+    || param === "/connect.html"
+    || param === "/connect/make-posting.html"
+    || param === "/connect/view-postings.html"
+    || param === "/courses.html"
+    || param === "/index.html"
+    || param === "/login.html"
+    //Howe: what is going on here?
+    || param === "/components/navigation-bar.html"
+    || param === "/js/connect/make-posting.js"
+    || param === "/js/courses.js"
+    ){
+    return true;
+  }
+  return false;
+}
+
 
 
 /*
@@ -28,7 +74,8 @@ var http = require('http');
 var fs = require("fs");
 var path = require("path");
 
-http.createServer(function(request, response) {
+
+var webpage = http.createServer(function(request, response) {
   urlRequest = request.url.toString();
 
   // //formatting the url to include ".html" if not there
@@ -87,55 +134,22 @@ http.createServer(function(request, response) {
     console.log(request.url.toString());
     console.log("ENTERED LAST");
 
-
-
     response.write("Invalid page request!");
     response.end();
   }
-}).listen(3000);
+})
 
 
-/*
-To do: learn how to implement css later
-For now: work on implementing backend
-
-*/
-function sendFileContent(response, fileName, contentType){
-  fs.readFile(fileName, function(err, data){
-    if(err){
-      response.writeHead(404);
-      response.write("Page not Found!");
-    }
-    else{
-      response.writeHead(200, {'Content-Type': contentType});
-      response.write(data);
-    }
-    response.end();
-  });
-}
-
-/*
-Function ensures that the page is one of several valid paths
-*/
-function verifyWebpage(param){
-  // console.log("Requested URL is: " + request.url);
-  if(param === "/"
-    || param === "/about.html"
-    || param === "/connect.html"
-    || param === "/connect/make-posting.html"
-    || param === "/connect/view-postings.html"
-    || param === "/courses.html"
-    || param === "/index.html"
-    || param === "/login.html"
-    || param === "/components/navigation-bar.html"
-    || param === "/js/connect/make-posting.js"
-    || param === "/js/courses.js"
-    ){
-    return true;
-  }
-  return false;
-}
 
 
-//Note: need a function that can detect if login, and then checks the information for the database if it matches
-//if so, that page will need to use oauth with facebook's api
+
+
+
+
+
+
+
+webpage.listen(3000);
+
+
+
