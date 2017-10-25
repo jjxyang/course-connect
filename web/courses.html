@@ -21,11 +21,8 @@
     <div class="container-fluid">
       <!-- TODO: make it so you have to log in first before you can do this -->
       <!-- TODO: make it so these checkboxes stay checked if you submitted once -->
-      <!-- TODO: make it so you cannot both have "taken" and "enrolled" in the same courses -->
-        <div id="status">
-        </div>
-      <form id="courses-taken-and-enrolled" method = "POST" action="/courses-profile">
-        <h3>What courses have you taken?</h3>
+      <form id="courses-taken-and-enrolled" onsubmit="return updateCoursesProfile()">
+        <h3>What courses have you taken? <span style="color:red">*</span></h3>
         <div style="padding:0px 0px 10px 0px;" class="input-group">
           <select class="selectpicker" multiple title="Select courses..." id="courses-taken">
             <option>EE 16A</option>
@@ -33,12 +30,13 @@
             <option>CS 61A</option>
             <option>CS 61B</option>
             <option>CS 61C</option>
+            <option>None of the above</option>
           </select>
         </div>
 
-        <h3>What courses are you currently enrolled in?</h3>
+        <h3>What courses are you currently enrolled in? <span style="color:red">*</span></h3>
         <div style="padding:0px 0px 10px 0px;" class="input-group">
-          <select class="selectpicker" multiple title="Select courses..." id="courses-taken">
+          <select class="selectpicker" multiple title="Select courses..." id="courses-enrolled">
             <option>EE 16A</option>
             <option>EE 16B</option>
             <option>CS 61A</option>
@@ -48,8 +46,7 @@
         </div>
 
         <div style="padding-top:20px">
-          <!-- TODO: send a POST request...? -->
-          <input class="btn btn-primary" type="submit" value="Submit">
+          <input class="btn btn-primary" type="submit" value="Submit"/>
         </div>
       </form>
     </div>
@@ -60,9 +57,12 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <!-- Bootstrap-select -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+
+  <!-- Custom JS -->
   <script>
     $(document).ready(function(){
         $('#cc-navbar').load('/components/navigation-bar.html');
     });
   </script>
+  <script type="text/javascript" src="js/courses.js"></script>
 </body>
