@@ -10,6 +10,7 @@ function makePosting() {
   // validate form
   if (course === "" || loc === "" || type === "") {
     alert("Please fill out all required fields.")
+    return false;
   }
 
   var posting = {
