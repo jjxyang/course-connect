@@ -24,7 +24,7 @@ function makePosting() {
 
   // TODO: socket.io --> send it via socket, emit it
 
-  // alert(JSON.stringify(posting));
+  alert(JSON.stringify(posting));
   socket.emit('make posting', {data: posting})
   return false;
 };

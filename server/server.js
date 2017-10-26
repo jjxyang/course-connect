@@ -56,7 +56,7 @@ function verifyWebpage(param){
 /*
       >>>>>CREATE SERVER<<<<<
 */
-var webpage = http.createServer(function(request, response) {
+function server(request, response) {
   urlRequest = request.url.toString();
   // //formatting the url to include ".html" if not there
   // if(urlRequest.slice(-5)!==".html"){
@@ -117,7 +117,12 @@ var webpage = http.createServer(function(request, response) {
     response.write("Invalid page request!");
     response.end();
   }
-})
+}
+
+
+var webpage = http.createServer(server);
+
+
 
 /*
       >>>>>LISTEN REQUESTS<<<<<
@@ -135,6 +140,7 @@ io.on('connection', function(socket) {
 
 
     //inside my terminal, I should be able to see the json information
+    //manipulate this 
     socket.on('make posting', function (data) {
       console.log(data);
     });
