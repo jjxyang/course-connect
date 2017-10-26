@@ -122,7 +122,8 @@ var webpage = http.createServer(function(request, response) {
 /*
       >>>>>LISTEN REQUESTS<<<<<
 */      
-var io = require('socket.io').listen(app);
+//your socket.io has a function "listen" where it listens to webpage for it to know what to do next
+var io = require('socket.io').listen(webpage);
 
 io.on('connection', function(socket) {
     // Use socket to communicate with this particular client only, sending it it's own id
@@ -131,12 +132,28 @@ io.on('connection', function(socket) {
     //not sure what console.log is doing here?
     //supposed to be accepting an input?
     //don't see an emit function inside of the client?
-    socket.on('make posting', console.log);
+
+
+    //inside my terminal, I should be able to see the json information
+    socket.on('make posting', function (data) {
+      console.log(data);
+    });
 
 
 });
 
 
+
+
+
+
+
+
+
+
+
+
+//webpage has a function "listen" that listens to localhost:3000
 webpage.listen(3000);
 
 

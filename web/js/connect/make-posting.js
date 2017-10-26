@@ -1,5 +1,7 @@
 function makePosting() {
   console.log("telling server to make a posting")
+  var socket = io('http://localhost:3000')
+
 
   // parse form
   var course = $('#course-selected').val();
@@ -22,6 +24,7 @@ function makePosting() {
 
   // TODO: socket.io --> send it via socket, emit it
 
-  alert(JSON.stringify(posting));
+  // alert(JSON.stringify(posting));
+  socket.emit('make posting', {data: posting})
   return false;
 };
