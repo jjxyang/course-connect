@@ -140,7 +140,7 @@ io.on('connection', function(socket) {
 
 
     //inside my terminal, I should be able to see the json information
-    //manipulate this
+    // TODO: manipulate this posting data
     socket.on('make posting', function (data) {
       console.log(data);
     });

@@ -1,5 +1,3 @@
-var socket = io();
-
 function makePosting() {
   console.log("telling server to make a posting")
   var socket = io('http://localhost:3000')
@@ -25,9 +23,6 @@ function makePosting() {
     "issueDetails": details
   }
 
-  // TODO: socket.io --> send it via socket, emit it
-
-  alert(JSON.stringify(posting));
   socket.emit('make posting', {data: posting})
   return false;
 };
