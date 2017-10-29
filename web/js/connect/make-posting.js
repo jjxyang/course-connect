@@ -1,7 +1,8 @@
+var socket = io();
+
 function makePosting() {
   console.log("telling server to make a posting")
   var socket = io('http://localhost:3000')
-
 
   // parse form
   var course = $('#course-selected').val();
@@ -10,7 +11,9 @@ function makePosting() {
   var details = $('#issue-details').val();
 
   // validate form
+  // TODO: see about security / possible attacks?
   if (course === "" || loc === "" || type === "") {
+    console.log("make a posting form incomplete")
     alert("Please fill out all required fields.")
     return false;
   }
