@@ -145,7 +145,10 @@ io.on('connection', function(socket) {
       console.log(data);
     });
 
-
+    // TODO: manipulate course profile data
+    socket.on('update courses', function (data) {
+      console.log(data);
+    });
 });
 
 
