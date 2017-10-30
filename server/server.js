@@ -11,8 +11,6 @@
 var http = require('http');
 var fs = require("fs");
 var path = require("path");
-var mongo = require("mongodb");
-
 /*
       >>>>>HELPER FUNCTIONS<<<<<
 */
@@ -126,6 +124,21 @@ var webpage = http.createServer(server);
 
 
 /*
+Mongodb stuff
+*/
+
+// Retrieve
+var MongoClient = require('mongodb').MongoClient;
+
+// Connect to the db
+MongoClient.connect("mongodb://localhost:27017/exampleDb", function(err, db) {
+  if(!err) {
+    console.log("We are connected");
+  }
+});
+
+
+/*
       >>>>>LISTEN REQUESTS<<<<<
 */      
 //your socket.io has a function "listen" where it listens to webpage for it to know what to do next
@@ -152,16 +165,8 @@ io.on('connection', function(socket) {
 
 
 
-
-
-
-
-
-
-
-
 //webpage has a function "listen" that listens to localhost:3000
-webpage.listen(80);
+webpage.listen(3000);
 
 
 
