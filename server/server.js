@@ -11,6 +11,7 @@
 var http = require('http');
 var fs = require("fs");
 var path = require("path");
+var mongo = require("mongodb");
 
 /*
       >>>>>HELPER FUNCTIONS<<<<<
