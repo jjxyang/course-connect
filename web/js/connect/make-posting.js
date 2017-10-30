@@ -13,6 +13,7 @@ function makePosting() {
   if (course === "" || loc === "" || type === "") {
     console.log("make a posting form incomplete")
     alert("Please fill out all required fields.")
+    event.preventDefault();
     return false;
   }
 
@@ -23,6 +24,8 @@ function makePosting() {
     "issueDetails": details
   }
 
-  socket.emit('make posting', {data: posting})
+  console.log('sending make-posting data');
+  socket.emit('make posting', {data: posting});
+  event.preventDefault();
   return false;
 };
