@@ -127,7 +127,7 @@ var webpage = http.createServer(server);
 
 /*
       >>>>>LISTEN REQUESTS<<<<<
-*/      
+*/
 //your socket.io has a function "listen" where it listens to webpage for it to know what to do next
 var io = require('socket.io').listen(webpage);
 
@@ -141,12 +141,15 @@ io.on('connection', function(socket) {
 
 
     //inside my terminal, I should be able to see the json information
-    //manipulate this 
+    // TODO: manipulate this posting data
     socket.on('make posting', function (data) {
       console.log(data);
     });
 
-
+    // TODO: manipulate course profile data
+    socket.on('update courses', function (data) {
+      console.log(data);
+    });
 });
 
 
@@ -161,11 +164,4 @@ io.on('connection', function(socket) {
 
 
 //webpage has a function "listen" that listens to localhost:3000
-webpage.listen(80);
-
-
-
-
-
-
-
+webpage.listen(3000);
