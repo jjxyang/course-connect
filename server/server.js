@@ -11,6 +11,7 @@
 var http = require('http');
 var fs = require("fs");
 var path = require("path");
+var mongo = require("mongodb");
 
 /*
       >>>>>HELPER FUNCTIONS<<<<<
@@ -160,7 +161,7 @@ io.on('connection', function(socket) {
 
 
 //webpage has a function "listen" that listens to localhost:3000
-webpage.listen(3000);
+webpage.listen(80);
 
 
 
