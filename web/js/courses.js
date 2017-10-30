@@ -1,8 +1,6 @@
-// const io = require('socket.io-client');
-// var socket = io();
-
 function updateCoursesProfile() {
   console.log("telling server to update courses profile");
+  var socket = io('http://localhost:3000')
 
   // parse form
   var taken = $('#courses-taken').val();
@@ -20,6 +18,7 @@ function updateCoursesProfile() {
     if (enrolled.indexOf(taken[i]) != -1) {
       console.log("user cannot be enrolled in a course they've already taken");
       alert("Users cannot be enrolled in a course they've already taken. Please check your selections and try again.");
+      event.preventDefault();
       return false;
     }
   }
@@ -29,8 +28,9 @@ function updateCoursesProfile() {
     "coursesEnrolled": enrolled
   }
 
-  // TODO: socket.io --> send it via socket, emit it
-
   alert(JSON.stringify(profile));
+  console.log('sending updated courses profile data');
+  socket.emit('update courses', {data: profile});
+  event.preventDefault();
   return false;
 };
