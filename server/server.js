@@ -1,22 +1,21 @@
 
-
 /*
-      >>>>>TO IMPLEMENT<<<<<
-*/
-//A function that can detect if login, and then checks the information for the database if it matches. If so, that page will need to use oauth with facebook's api
-
-/*
-      >>>>>IMPORTS<<<<<
+      >>>IMPORTS<<<
 */
 var http = require('http');
 var fs = require("fs");
 var path = require("path");
-/*
-      >>>>>HELPER FUNCTIONS<<<<<
-*/
 
-// To do: learn how to implement css later
-// For now: work on implementing backend
+
+/*
+      >>>GLOBAL VARIABLES<<<
+*/
+var usersSet = new Set();
+
+/*
+      >>>WEBPAGE FUNCTIONS<<<
+*/
+//sends corresponding FileContent to client to open
 function sendFileContent(response, fileName, contentType){
   fs.readFile(fileName, function(err, data){
     if(err){
@@ -31,83 +30,73 @@ function sendFileContent(response, fileName, contentType){
   });
 }
 
-// Function ensures that the page is one of several valid paths
+//ensures that the webpage is one of several valid paths
 function verifyWebpage(param){
-  // console.log("Requested URL is: " + request.url);
   if(param === "/"
-    || param === "/about.html"
-    || param === "/connect.html"
-    || param === "/connect/make-posting.html"
-    || param === "/connect/view-postings.html"
-    || param === "/courses.html"
     || param === "/index.html"
-    || param === "/login.html"
-    //Howe: what is going on here?
-    || param === "/components/navigation-bar.html"
-    || param === "/js/connect/make-posting.js"
-    || param === "/js/courses.js"
+    //|| param === "SCHOOL-LOCATIONS-HERE.HTML"
     ){
     return true;
   }
   return false;
 }
 
+//checks for components for css and javascripts
+function verifyComponent(param){
+  //No components yet
+  // if (param === "/components/navigation-bar.html"
+  //   || param === "/js/connect/make-posting.js"
+  //   || param === "/js/courses.js"
+  //   ){
+  //   return true;
+  // }
+  return false;
+}
+
+//wrapper function for webpages and css/javascript
+function verifyWebRequest(param){
+  if(verifyWebpage(param) || verifyComponent(param)){
+    return true;
+  }
+  return false;
+}
+
 /*
-      >>>>>CREATE SERVER<<<<<
+      >>>CREATE SERVER<<<
 */
 function server(request, response) {
   urlRequest = request.url.toString();
-  // //formatting the url to include ".html" if not there
-  // if(urlRequest.slice(-5)!==".html"){
-  //   console.log("ENTERED");
-  //   urlRequest = urlRequest + ".html";
-  //   console.log(urlRequest);
-  // }
 
-  if (verifyWebpage(urlRequest)){
+  if (verifyWebRequest(urlRequest)){
     //Set homepage at index.html
     if(urlRequest === "/"){
       urlRequest = urlRequest + "index.html"
     }
 
-    //actual code
     console.log("ENTERED HTML");
     console.log("urlRequest: " + urlRequest);
 
-
     filePath = path.join(__dirname, '..', '/web', urlRequest);
     console.log(filePath);
+
     sendFileContent(response, filePath, "text/html");
-  }
-  /*
-  Work on js implementation later
-  Need to understand why this can't be commented
-  Otherwise seems to have three separate calls going on in server.js
-  */
-  else if(/^\/[a-zA-Z0-9\/]*.js$/.test(request.url.toString())) {
+  } else if(/^\/[a-zA-Z0-9\/]*.js$/.test(request.url.toString())) {
     console.log("ENTERED JAVASCRIPT");
     console.log("urlRequest: " + urlRequest);
 
-
     filePath = path.join(__dirname, '..', '/web', urlRequest);
     console.log(filePath);
+
     sendFileContent(response, filePath, "text/javascript");
-  }
-  /*
-  Work on CSS implementation later
-  Need to understand why this can't be commented
-  Otherwise seems to have three separate calls going on in server.js
-  */
-  else if(/^\/[a-zA-Z0-9\/]*.css$/.test(request.url.toString())) {
+  }  else if(/^\/[a-zA-Z0-9\/]*.css$/.test(request.url.toString())) {
     console.log("ENTERED CSS");
     console.log("urlRequest: " + urlRequest);
 
-
     filePath = path.join(__dirname, '..', '/web', urlRequest);
+
     console.log(filePath);
     sendFileContent(response, filePath, "text/css");
-  }
-  else{
+  } else{
     console.log("Invalid page request... URL: " + request.url);
     console.log(/^\/[a-zA-Z0-9\/]*.js$/.test(request.url.toString()));
     console.log(request.url.toString());
@@ -118,56 +107,84 @@ function server(request, response) {
   }
 }
 
-
 var webpage = http.createServer(server);
 
 
-
 /*
-Mongodb stuff
-*/
-
-// Retrieve
-var MongoClient = require('mongodb').MongoClient;
-
-// Connect to the db
-MongoClient.connect("mongodb://localhost:27017/exampleDb", function(err, db) {
-  if(!err) {
-    console.log("We are connected");
-  }
-});
-
-
-/*
-      >>>>>LISTEN REQUESTS<<<<<
+      >>>LISTEN REQUESTS<<<
 */
 //your socket.io has a function "listen" where it listens to webpage for it to know what to do next
 var io = require('socket.io').listen(webpage);
 
 io.on('connection', function(socket) {
     // Use socket to communicate with this particular client only, sending it it's own id
+    socket.emit('welcome', {message: 'Welcome to CourseConnect!'});
 
-    //what goes on after hearing the event 'make posting'?
-    //not sure what console.log is doing here?
-    //supposed to be accepting an input?
-    //don't see an emit function inside of the client?
-
-
-    //inside my terminal, I should be able to see the json information
-    // TODO: manipulate this posting data
-    socket.on('make posting', function (data) {
-      console.log(data);
-    });
-
-    // TODO: manipulate course profile data
-    socket.on('update courses', function (data) {
-      console.log(data);
-    });
+    //listen for the userID data
+    //consolidate and compile received client data to a set
+    socket.on('clientUser', addUser(data.userID));
 });
+
+
+/*
+      >>>EMIT REQUESTS<<<
+*/
+//aggregates and sends the list of all users found in open clients
+function sendUsers() {
+  //need to modify
+    io.emit('users', {users: getUsers()} );
+}
+
+//send to the client the list of users of each user every 10 seconds
+setInterval(sendUsers, 10000);
+
+
+/*
+      >>>SERVER HELPER FUNCTIONS<<<
+*/
+function addUser(user) {
+    usersSet.add(user);
+}
+
+//TODO:
+//need to figure out a way to get users removed
+//should this happen in client or in server?
+//as in... should the server detect a timeout and then remove a user (that's a lot of things to keep track of!)
+//or... should the client tell the server when a user has left? (can this be done automatically on exit of a frame?)
+function removeUser(user){
+
+}
+
+//getUsers will only be correct for the index... since we haven't implemented the other chat-channels based on school locations yet
+function getUsers(){
+  return usersSet.toString();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 //webpage has a function "listen" that listens to localhost:3000
 webpage.listen(3000);
-
