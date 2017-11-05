@@ -4,8 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <!-- TODO: include Google app info here -->
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     <title>Course Connect</title>
 
@@ -16,31 +18,65 @@
 </head>
 
 <body>
-  <div id="cc-navbar"></div>
-
-  <!-- Page Content -->
-  <div class="page-content-wrapper">
-      <div class="container-fluid" >
-          <h2 style="padding-bottom:15px;">Connect over courses (and more) fast.</h2>
-          <h4 style="padding-bottom:15px;">Busy but still want to help a fellow student out? Crunched for time but need a quick chat about a class?</h4>
-          <h4 style="padding-bottom:15px;">Study for classes, listen, get help, and give advice - and only commit to 7 minutes of your time, at a time.</h4>
-          <h4 style="padding-bottom:15px;">Get started now!</h4>
-          <div></div>
-          <a class="btn btn-primary" href="login.html">Log in</a>
-          <a class="btn btn-primary" href="courses.html">Edit your courses</a>
-          <a class="btn btn-primary" href="connect.html">Connect with another student</a>
+  <ul class="pages">
+    <li class="connect page">
+      <div class="studySpaceArea">
+        <h3 class="title">Cory Hall</h3>
+        <!-- <ul class="messages"></ul> -->
       </div>
-  </div>
-  <!-- /#page-content-wrapper -->
+      <!-- <input class="inputMessage" placeholder="Type here..."/> -->
+    </li>
+
+    <li class="join page">
+      <h3 class="title">Join a study space to find classmates!</h3>
+      <form onsubmit="return joinStudySpace()">
+        <select id="chosenSpace">
+          <option>Cory Hall</option>
+          <option>Soda Hall</option>
+          <option>MLK Center</option>
+        </select>
+
+        <div style="padding-top:20px">
+          <input class="btn btn-primary" type="submit" value="Join"/>
+        </div>
+      </form>
+    </li>
+
+    <li class="login page">
+      <h3 class="title">Welcome to Course Connect!</h3>
+      <h3 class="title">Find where your classmates are and study with them!</h3>
+      <h3 class="title">Please log in...</h3>
+      <button class="btn btn-primary" id="tempSignIn">Temp Sign-in</button>
+      <div id="status"></div>
+
+      <!-- Google OAuth -->
+      <div class="col-md-12 text-center">
+        <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+        <script>
+          function onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            console.log('Full Name: ' + profile.getName());
+            console.log('Given Name: ' + profile.getGivenName());
+            console.log('Family Name: ' + profile.getFamilyName());
+            console.log("Image URL: " + profile.getImageUrl());
+            console.log("Email: " + profile.getEmail());
+
+            // The ID token you need to pass to your backend:
+            var id_token = googleUser.getAuthResponse().id_token;
+            console.log("ID Token: " + id_token);
+          };
+        </script>
+      </div>
+    </li>
+  </ul>
+
 
   <!-- Bootstrap core JavaScript -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script>
-    $(document).ready(function(){
-        $('#cc-navbar').load('/components/navigation-bar.html');
-    });
-  </script>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/main.js"></script>
 </body>
 
 </html>

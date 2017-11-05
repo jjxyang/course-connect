@@ -122,7 +122,7 @@ io.on('connection', function(socket) {
 
     //listen for the userID data
     //consolidate and compile received client data to a set
-    socket.on('clientUser', addUser(data.userID));
+    // socket.on('clientUser', addUser(data.userID));
 });
 
 
