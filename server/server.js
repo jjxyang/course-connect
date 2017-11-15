@@ -1,16 +1,10 @@
 
 /*
-      >>>IMPORTS<<<
+      >>>WEBPAGE IMPORTS<<<
 */
 var http = require('http');
 var fs = require("fs");
 var path = require("path");
-
-
-/*
-      >>>GLOBAL VARIABLES<<<
-*/
-var usersSet = new Set();
 
 /*
       >>>WEBPAGE FUNCTIONS<<<
@@ -106,9 +100,13 @@ function server(request, response) {
     response.end();
   }
 }
-
 var webpage = http.createServer(server);
 
+/*
+      >>>LOCAL VARIABLES<<<
+*/
+var userSet = new Set();
+var spaceDict = ["Cory", ];
 
 /*
       >>>LISTEN REQUESTS<<<
@@ -130,20 +128,22 @@ io.on('connection', function(socket) {
       >>>EMIT REQUESTS<<<
 */
 //aggregates and sends the list of all users found in open clients
-function sendUsers() {
+function showOnlineUsers() {
   //need to modify
-    io.emit('users', {users: getUsers()} );
+    io.emit('show online users', {numPeople: ??, studySpace: ??} );
 }
 
 //send to the client the list of users of each user every 10 seconds
-setInterval(sendUsers, 10000);
+setInterval(showOnlineUsers, 10000);
+
+
 
 
 /*
       >>>SERVER HELPER FUNCTIONS<<<
 */
 function addUser(user) {
-    usersSet.add(user);
+    userSet.add(user);
 }
 
 //TODO:
@@ -157,7 +157,7 @@ function removeUser(user){
 
 //getUsers will only be correct for the index... since we haven't implemented the other chat-channels based on school locations yet
 function getUsers(){
-  return usersSet.toString();
+  return userSet.toString();
 }
 
 
