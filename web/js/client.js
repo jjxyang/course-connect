@@ -16,10 +16,9 @@ $(function() {
   var $loginPage = $('.login.page'); // The login page
   var $connectPage = $('.connect.page'); // The chatroom page
 
-  // Prompt for setting a username
+  var googleProfile;
   var username;
   var connected = false;
-  // var $currentInput = $usernameInput.focus();
 
   var socket = io();
 
@@ -28,10 +27,10 @@ $(function() {
     setUsername();
   });
 
-  function joinStudySpace () {
-    event.preventDefault();
-    return false;
-  }
+  // temp "join cory hall study space button"
+  $('#coryHall').on('click', function (e) {
+    socket.emit("add user", {googleUser: googleProfile, studySpace: "Cory Hall"});
+  });
 
   function addParticipantsMessage (data) {
     var message = '';
@@ -43,11 +42,23 @@ $(function() {
     log(message);
   }
 
+  // Sets the client's google profile
+  function setProfile () {
+    // TODO: verify that the google email is a berkeley email
+    // TODO: save the google profile as googleProfile
+
+    // If the email is valid, fade out page
+    if (email) {
+      $loginPage.fadeOut();
+      $connectPage.show();
+      $loginPage.off('click');
+    }
+  }
+
   // Sets the client's username
   function setUsername () {
-    username = cleanInput("first last".trim());
-    $('#status').text(username);
-    console.log("setting username");
+    username = cleanInput("first".trim());
+    console.log("setting username: " + username);
 
     // If the username is valid
     if (username) {
@@ -115,22 +126,6 @@ $(function() {
     return COLORS[index];
   }
 
-  // Keyboard events
-
-  $window.keydown(function (event) {
-    // Auto-focus the current input when a key is typed
-    if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
-    }
-  });
-
-  // Click events
-
-  // Focus input when clicking on the message input's border
-  $inputMessage.click(function () {
-    $inputMessage.focus();
-  });
-
   // Socket events
 
   // Whenever the server emits 'login', log the login message
@@ -159,7 +154,6 @@ $(function() {
   socket.on('user left', function (data) {
     log(data.username + ' left');
     addParticipantsMessage(data);
-    removeChatTyping(data);
   });
 
   socket.on('disconnect', function () {
@@ -176,5 +170,4 @@ $(function() {
   socket.on('reconnect_error', function () {
     log('attempt to reconnect has failed');
   });
-
 });

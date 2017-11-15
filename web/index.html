@@ -29,17 +29,7 @@
 
     <li class="join page">
       <h3 class="title">Join a study space to find classmates!</h3>
-      <form onsubmit="return joinStudySpace()">
-        <select id="chosenSpace">
-          <option>Cory Hall</option>
-          <option>Soda Hall</option>
-          <option>MLK Center</option>
-        </select>
-
-        <div style="padding-top:20px">
-          <input class="btn btn-primary" type="submit" value="Join"/>
-        </div>
-      </form>
+      <button id="coryHall" class="btn btn-primary">Cory Hall</button>
     </li>
 
     <li class="login page">
@@ -47,7 +37,6 @@
       <h3 class="title">Find where your classmates are and study with them!</h3>
       <h3 class="title">Please log in...</h3>
       <button class="btn btn-primary" id="tempSignIn">Temp Sign-in</button>
-      <div id="status"></div>
 
       <!-- Google OAuth -->
       <div class="col-md-12 text-center">
@@ -76,7 +65,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/main.js"></script>
+  <script src="/js/client.js"></script>
 </body>
 
 </html>
