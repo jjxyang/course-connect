@@ -24,11 +24,13 @@ $(document).ready(function() {
 
   // google auth signin
   window.onSignIn = function (googleUser) {
-    var googleProfile = googleUser;
+    // save off the googleUser
+    googleProfile = googleUser;
     var profile = googleUser.getBasicProfile();
     console.log('Full Name: ' + profile.getName());
     console.log('Given Name: ' + profile.getGivenName());
     console.log("Email: " + profile.getEmail());
+    console.log("googleProfile: " + googleProfile);
 
     // ID token to pass to backend
     // var id_token = googleUser.getAuthResponse().id_token;
