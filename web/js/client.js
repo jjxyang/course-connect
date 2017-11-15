@@ -1,6 +1,5 @@
 $(function() {
   var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
@@ -9,10 +8,6 @@ $(function() {
 
   // Initialize variables
   var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
-  var $messages = $('.messages'); // Messages area
-  var $inputMessage = $('.inputMessage'); // Input message input box
-
   var $loginPage = $('.login.page'); // The login page
   var $connectPage = $('.connect.page'); // The chatroom page
 
@@ -31,16 +26,6 @@ $(function() {
   $('#coryHall').on('click', function (e) {
     socket.emit("add user", {googleUser: googleProfile, studySpace: "Cory Hall"});
   });
-
-  function addParticipantsMessage (data) {
-    var message = '';
-    if (data.numUsers === 1) {
-      message += "there's 1 participant";
-    } else {
-      message += "there are " + data.numUsers + " participants";
-    }
-    log(message);
-  }
 
   // Sets the client's google profile
   function setProfile () {
@@ -65,7 +50,6 @@ $(function() {
       $loginPage.fadeOut();
       $connectPage.show();
       $loginPage.off('click');
-      // $currentInput = $inputMessage.focus();
 
       // Tell the server your username
       socket.emit('add user', username);
