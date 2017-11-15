@@ -1,4 +1,4 @@
-$(function() {
+$(document).ready(function() {
   var FADE_TIME = 150; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
@@ -22,8 +22,22 @@ $(function() {
     setUsername();
   });
 
+  // google auth signin
+  window.onSignIn = function (googleUser) {
+    var googleProfile = googleUser;
+    var profile = googleUser.getBasicProfile();
+    console.log('Full Name: ' + profile.getName());
+    console.log('Given Name: ' + profile.getGivenName());
+    console.log("Email: " + profile.getEmail());
+
+    // ID token to pass to backend
+    // var id_token = googleUser.getAuthResponse().id_token;
+    // console.log("ID Token: " + id_token);
+  };
+
   // temp "join cory hall study space button"
   $('#coryHall').on('click', function (e) {
+    console.log("googleUser: " + googleProfile);
     socket.emit("add user", {googleUser: googleProfile, studySpace: "Cory Hall"});
   });
 
