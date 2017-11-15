@@ -1,6 +1,5 @@
-$(function() {
+$(document).ready(function() {
   var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
@@ -9,10 +8,6 @@ $(function() {
 
   // Initialize variables
   var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
-  var $messages = $('.messages'); // Messages area
-  var $inputMessage = $('.inputMessage'); // Input message input box
-
   var $loginPage = $('.login.page'); // The login page
   var $connectPage = $('.connect.page'); // The chatroom page
 
@@ -27,20 +22,26 @@ $(function() {
     setUsername();
   });
 
+  // google auth signin
+  window.onSignIn = function (googleUser) {
+    // save off the googleUser
+    googleProfile = googleUser;
+    var profile = googleUser.getBasicProfile();
+    console.log('Full Name: ' + profile.getName());
+    console.log('Given Name: ' + profile.getGivenName());
+    console.log("Email: " + profile.getEmail());
+    console.log("googleProfile: " + googleProfile);
+
+    // ID token to pass to backend
+    // var id_token = googleUser.getAuthResponse().id_token;
+    // console.log("ID Token: " + id_token);
+  };
+
   // temp "join cory hall study space button"
   $('#coryHall').on('click', function (e) {
+    console.log("googleUser: " + googleProfile);
     socket.emit("add user", {googleUser: googleProfile, studySpace: "Cory Hall"});
   });
-
-  function addParticipantsMessage (data) {
-    var message = '';
-    if (data.numUsers === 1) {
-      message += "there's 1 participant";
-    } else {
-      message += "there are " + data.numUsers + " participants";
-    }
-    log(message);
-  }
 
   // Sets the client's google profile
   function setProfile () {
@@ -65,7 +66,6 @@ $(function() {
       $loginPage.fadeOut();
       $connectPage.show();
       $loginPage.off('click');
-      // $currentInput = $inputMessage.focus();
 
       // Tell the server your username
       socket.emit('add user', username);
