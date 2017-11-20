@@ -1,16 +1,10 @@
 
 /*
-      >>>IMPORTS<<<
+      >>>WEBPAGE IMPORTS<<<
 */
 var http = require('http');
 var fs = require("fs");
 var path = require("path");
-
-
-/*
-      >>>GLOBAL VARIABLES<<<
-*/
-var usersSet = new Set();
 
 /*
       >>>WEBPAGE FUNCTIONS<<<
@@ -106,9 +100,13 @@ function server(request, response) {
     response.end();
   }
 }
-
 var webpage = http.createServer(server);
 
+/*
+      >>>LOCAL VARIABLES<<<
+*/
+var userSet = new Set();
+var spaceDict = {};
 
 /*
       >>>LISTEN REQUESTS<<<
@@ -122,7 +120,12 @@ io.on('connection', function(socket) {
 
     //listen for the userID data
     //consolidate and compile received client data to a set
-    // socket.on('clientUser', addUser(data.userID));
+    socket.on('add user', addUser(data));
+    socket.on('remove user', removeUser(data));
+    socket.on('update posting', updatePosting(data));
+
+
+
 });
 
 
@@ -130,38 +133,70 @@ io.on('connection', function(socket) {
       >>>EMIT REQUESTS<<<
 */
 //aggregates and sends the list of all users found in open clients
-function sendUsers() {
+function showOnlineUsers() {
   //need to modify
-    io.emit('users', {users: getUsers()} );
+    io.emit('show online users', {dictionary: getNumPeople()} );
 }
 
 //send to the client the list of users of each user every 10 seconds
-setInterval(sendUsers, 10000);
-
+setInterval(showOnlineUsers, 10000);
 
 /*
       >>>SERVER HELPER FUNCTIONS<<<
 */
-function addUser(user) {
-    usersSet.add(user);
+function addUser(info) {
+    var googleUser = info.googleUser;
+    var studySpace = info.studySpace;
+    var posting = info.posting;
+
+    if(spaceDict[studySpace] == null){
+      spaceDict[studySpace] = [googleUser, posting];
+    }else{
+      spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [googleUser, posting]); //combine lists and update
+    }
 }
 
-//TODO:
-//need to figure out a way to get users removed
-//should this happen in client or in server?
-//as in... should the server detect a timeout and then remove a user (that's a lot of things to keep track of!)
-//or... should the client tell the server when a user has left? (can this be done automatically on exit of a frame?)
-function removeUser(user){
+function removeUser(info){
+    var googleUser = info.googleUser;
+    var studySpace = info.studySpace;
+    var posting = info.posting;
 
+    if(spaceDict[studySpace] != null){
+      var list = spaceDict[studySpace];
+      var length = list.length;
+      for(int index = 0; index<length; index++){
+        if (list[index][0] == googleUser){
+          list.splice(index, 1); //remove the element at this index
+          spaceDict[studySpace] = list; //update the element inside the dictionary
+        }
+      }
+    }
 }
 
-//getUsers will only be correct for the index... since we haven't implemented the other chat-channels based on school locations yet
-function getUsers(){
-  return usersSet.toString();
+function updatePosting(info){
+    var googleUser = info.googleUser;
+    var studySpace = info.studySpace;
+    var posting = info.posting;
+
+    if(spaceDict[studySpace] != null){
+      var list = spaceDict[studySpace];
+      var length = list.length;
+      for(int index = 0; index<length; index++){
+        if (list[index][0] == googleUser){
+          list.splice(index, 1); //remove the element at this index
+        }
+        spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [googleUser, posting]); //combine lists and update
+      }
+    }
+
+function getNumPeople(){
+  var spaceDictNumPeople = {};
+  for(var key in spaceDict){
+    var value = spaceDict[key];
+    spaceDictNumPeople[key] = value.length;
+  }
+  return spaceDictNumPeople;
 }
-
-
-
 
 
 
