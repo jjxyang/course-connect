@@ -31,10 +31,6 @@ $(document).ready(function() {
     console.log('Given Name: ' + profile.getGivenName());
     console.log("Email: " + profile.getEmail());
     console.log("googleProfile: " + googleProfile);
-
-    // ID token to pass to backend
-    // var id_token = googleUser.getAuthResponse().id_token;
-    // console.log("ID Token: " + id_token);
   };
 
   // temp "join cory hall study space button"

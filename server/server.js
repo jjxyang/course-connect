@@ -157,37 +157,37 @@ function addUser(info) {
 }
 
 function removeUser(info){
-    var googleUser = info.googleUser;
-    var studySpace = info.studySpace;
-    var posting = info.posting;
+  var googleUser = info.googleUser;
+  var studySpace = info.studySpace;
+  var posting = info.posting;
 
-    if(spaceDict[studySpace] != null){
-      var list = spaceDict[studySpace];
-      var length = list.length;
-      for(int index = 0; index<length; index++){
-        if (list[index][0] == googleUser){
-          list.splice(index, 1); //remove the element at this index
-          spaceDict[studySpace] = list; //update the element inside the dictionary
-        }
+  if(spaceDict[studySpace] != null) {
+    var list = spaceDict[studySpace];
+    for(i = 0; i < list.length; i++) {
+      if (list[i][0] == googleUser) {
+        list.splice(i, 1); //remove the element at this index
+        spaceDict[studySpace] = list; //update the element inside the dictionary
       }
     }
+  }
 }
 
-function updatePosting(info){
-    var googleUser = info.googleUser;
-    var studySpace = info.studySpace;
-    var posting = info.posting;
+function updatePosting(info) {
+  var googleUser = info.googleUser;
+  var studySpace = info.studySpace;
+  var posting = info.posting;
 
-    if(spaceDict[studySpace] != null){
-      var list = spaceDict[studySpace];
-      var length = list.length;
-      for(int index = 0; index<length; index++){
-        if (list[index][0] == googleUser){
-          list.splice(index, 1); //remove the element at this index
-        }
-        spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [googleUser, posting]); //combine lists and update
+  if(spaceDict[studySpace] != null) {
+    var list = spaceDict[studySpace];
+    var length = list.length;
+    for(i = 0; i < list.length; i++) {
+      if (list[i][0] == googleUser) {
+        list.splice(i, 1); //remove the element at this index
       }
+      spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [googleUser, posting]); //combine lists and update
     }
+  }
+}
 
 function getNumPeople(){
   var spaceDictNumPeople = {};
@@ -197,17 +197,6 @@ function getNumPeople(){
   }
   return spaceDictNumPeople;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 
