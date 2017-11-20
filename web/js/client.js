@@ -8,8 +8,9 @@ $(document).ready(function() {
 
   // Initialize variables
   var $window = $(window);
-  var $loginPage = $('.login.page'); // The login page
-  var $connectPage = $('.connect.page'); // The chatroom page
+  var $loginPage = $('.login.page'); // the login page
+  var $joinPage = $('.join.page'); // the join page
+  var $connectPage = $('.connect.page'); // the connect page
 
   var gUser;
   var userPosting;
@@ -51,6 +52,10 @@ $(document).ready(function() {
       };
       console.log("adding user");
       socket.emit("add user", data);
+
+      $joinPage.fadeOut();
+      $connectPage.show();
+      $joinPage.off('click');
     }
   });
 
@@ -92,7 +97,7 @@ $(document).ready(function() {
     if (email.indexOf("@berkeley.edu") !== -1) {
       console.log("yay you're a berkeley student")
       $loginPage.fadeOut();
-      $connectPage.show();
+      $joinPage.show();
       $loginPage.off('click');
 
       // Tell the server your username
