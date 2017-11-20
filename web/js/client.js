@@ -11,7 +11,7 @@ $(document).ready(function() {
   var $loginPage = $('.login.page'); // The login page
   var $connectPage = $('.connect.page'); // The chatroom page
 
-  var googleProfile;
+  var gUser;
   var username;
   var connected = false;
 
@@ -19,24 +19,26 @@ $(document).ready(function() {
 
   // temp signin button
   $('#tempSignIn').on('click', function (e) {
-    setUsername();
+    setProfile();
   });
 
   // google auth signin
   window.onSignIn = function (googleUser) {
     // save off the googleUser
-    googleProfile = googleUser;
+    gUser = googleUser;
     var profile = googleUser.getBasicProfile();
+    var email = profile.getEmail();
     console.log('Full Name: ' + profile.getName());
     console.log('Given Name: ' + profile.getGivenName());
     console.log("Email: " + profile.getEmail());
-    console.log("googleProfile: " + googleProfile);
+    console.log("gUser: " + gUser);
+    console.log("signed in!")
   };
 
   // temp "join cory hall study space button"
   $('#coryHall').on('click', function (e) {
-    console.log("googleUser: " + googleProfile);
-    socket.emit("add user", {googleUser: googleProfile, studySpace: "Cory Hall"});
+    console.log("googleUser: " + gUser);
+    console.log("adding user");
   });
 
   // Sets the client's google profile
@@ -52,13 +54,15 @@ $(document).ready(function() {
     }
   }
 
-  // Sets the client's username
-  function setUsername () {
-    username = cleanInput("first".trim());
-    console.log("setting username: " + username);
+  // Sets the client's google profile
+  function setProfile () {
+    var email = gUser.getBasicProfile().getEmail();
+    console.log("setting profile");
+    console.log("gUser: " + gUser);
 
-    // If the username is valid
-    if (username) {
+    // If the email is valid, fade out page
+    if (email.indexOf("@berkeley.edu") !== -1) {
+      console.log("yay you're a berkeley student")
       $loginPage.fadeOut();
       $connectPage.show();
       $loginPage.off('click');
@@ -100,7 +104,8 @@ $(document).ready(function() {
     if (options.prepend) {
       $messages.prepend($el);
     } else {
-      $messages.append($el);
+      alert("Sorry, you're not a Berkeley student!");
+      console.log("you're not a berkeley student O:<");
     }
     $messages[0].scrollTop = $messages[0].scrollHeight;
   }
