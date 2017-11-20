@@ -12,6 +12,7 @@ $(document).ready(function() {
   var $connectPage = $('.connect.page'); // The chatroom page
 
   var gUser;
+  var userPosting;
   var username;
   var connected = false;
 
@@ -38,19 +39,46 @@ $(document).ready(function() {
   // temp "join cory hall study space button"
   $('#coryHall').on('click', function (e) {
     console.log("googleUser: " + gUser);
-    console.log("adding user");
+    // TODO: what's publicUserID
+
+    var posting = createPosting();
+    if (posting !== undefined) {
+      userPosting = posting;
+      var data = {
+        googleUser: gUser,
+        studySpace: "Cory Hall",
+        posting: posting
+      };
+      console.log("adding user");
+      socket.emit("add user", data);
+    }
   });
 
   // Sets the client's google profile
-  function setProfile () {
-    // TODO: verify that the google email is a berkeley email
-    // TODO: save the google profile as googleProfile
+  function createPosting () {
+    var name = gUser.getBasicProfile().getGivenName();
+    var topic = $('#topic').val();
+    var category = $('#category').val();
+    var status = $('input[name=status]:checked', '#statusChoice').val();
 
-    // If the email is valid, fade out page
-    if (email) {
-      $loginPage.fadeOut();
-      $connectPage.show();
-      $loginPage.off('click');
+    // format name
+    name = name.toLowerCase();
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    topic = cleanInput(topic);
+
+    // verify topic is not empty
+    if (topic === "") {
+      alert("Please choose a class or topic.");
+      return undefined;
+    } else {
+      var posting = {
+        name: name,
+        topic: topic,
+        category: category,
+        status: status
+      }
+      console.log(posting);
+      return posting;
     }
   }
 
