@@ -1,6 +1,5 @@
-$(function() {
+$(document).ready(function() {
   var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
   var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
@@ -9,17 +8,12 @@ $(function() {
 
   // Initialize variables
   var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
-  var $messages = $('.messages'); // Messages area
-  var $inputMessage = $('.inputMessage'); // Input message input box
-
   var $loginPage = $('.login.page'); // The login page
   var $connectPage = $('.connect.page'); // The chatroom page
 
-  // Prompt for setting a username
+  var googleProfile;
   var username;
   var connected = false;
-  // var $currentInput = $usernameInput.focus();
 
   var socket = io();
 
@@ -28,33 +22,50 @@ $(function() {
     setUsername();
   });
 
-  function joinStudySpace () {
-    event.preventDefault();
-    return false;
-  }
+  // google auth signin
+  window.onSignIn = function (googleUser) {
+    // save off the googleUser
+    googleProfile = googleUser;
+    var profile = googleUser.getBasicProfile();
+    console.log('Full Name: ' + profile.getName());
+    console.log('Given Name: ' + profile.getGivenName());
+    console.log("Email: " + profile.getEmail());
+    console.log("googleProfile: " + googleProfile);
 
-  function addParticipantsMessage (data) {
-    var message = '';
-    if (data.numUsers === 1) {
-      message += "there's 1 participant";
-    } else {
-      message += "there are " + data.numUsers + " participants";
+    // ID token to pass to backend
+    // var id_token = googleUser.getAuthResponse().id_token;
+    // console.log("ID Token: " + id_token);
+  };
+
+  // temp "join cory hall study space button"
+  $('#coryHall').on('click', function (e) {
+    console.log("googleUser: " + googleProfile);
+    socket.emit("add user", {googleUser: googleProfile, studySpace: "Cory Hall"});
+  });
+
+  // Sets the client's google profile
+  function setProfile () {
+    // TODO: verify that the google email is a berkeley email
+    // TODO: save the google profile as googleProfile
+
+    // If the email is valid, fade out page
+    if (email) {
+      $loginPage.fadeOut();
+      $connectPage.show();
+      $loginPage.off('click');
     }
-    log(message);
   }
 
   // Sets the client's username
   function setUsername () {
-    username = cleanInput("first last".trim());
-    $('#status').text(username);
-    console.log("setting username");
+    username = cleanInput("first".trim());
+    console.log("setting username: " + username);
 
     // If the username is valid
     if (username) {
       $loginPage.fadeOut();
       $connectPage.show();
       $loginPage.off('click');
-      // $currentInput = $inputMessage.focus();
 
       // Tell the server your username
       socket.emit('add user', username);
@@ -115,22 +126,6 @@ $(function() {
     return COLORS[index];
   }
 
-  // Keyboard events
-
-  $window.keydown(function (event) {
-    // Auto-focus the current input when a key is typed
-    if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
-    }
-  });
-
-  // Click events
-
-  // Focus input when clicking on the message input's border
-  $inputMessage.click(function () {
-    $inputMessage.focus();
-  });
-
   // Socket events
 
   // Whenever the server emits 'login', log the login message
@@ -159,7 +154,6 @@ $(function() {
   socket.on('user left', function (data) {
     log(data.username + ' left');
     addParticipantsMessage(data);
-    removeChatTyping(data);
   });
 
   socket.on('disconnect', function () {
@@ -176,5 +170,4 @@ $(function() {
   socket.on('reconnect_error', function () {
     log('attempt to reconnect has failed');
   });
-
 });

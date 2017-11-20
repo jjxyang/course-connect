@@ -4,9 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- TODO: include Google app info here -->
     <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+    <meta name="google-signin-client_id" content="579097782251-5gu8lp3m2act1277smb5u1j29hiu38ri.apps.googleusercontent.com">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     <title>Course Connect</title>
@@ -29,17 +28,7 @@
 
     <li class="join page">
       <h3 class="title">Join a study space to find classmates!</h3>
-      <form onsubmit="return joinStudySpace()">
-        <select id="chosenSpace">
-          <option>Cory Hall</option>
-          <option>Soda Hall</option>
-          <option>MLK Center</option>
-        </select>
-
-        <div style="padding-top:20px">
-          <input class="btn btn-primary" type="submit" value="Join"/>
-        </div>
-      </form>
+      <button id="coryHall" class="btn btn-primary">Cory Hall</button>
     </li>
 
     <li class="login page">
@@ -47,25 +36,10 @@
       <h3 class="title">Find where your classmates are and study with them!</h3>
       <h3 class="title">Please log in...</h3>
       <button class="btn btn-primary" id="tempSignIn">Temp Sign-in</button>
-      <div id="status"></div>
 
       <!-- Google OAuth -->
       <div class="col-md-12 text-center">
         <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-        <script>
-          function onSignIn(googleUser) {
-            var profile = googleUser.getBasicProfile();
-            console.log('Full Name: ' + profile.getName());
-            console.log('Given Name: ' + profile.getGivenName());
-            console.log('Family Name: ' + profile.getFamilyName());
-            console.log("Image URL: " + profile.getImageUrl());
-            console.log("Email: " + profile.getEmail());
-
-            // The ID token you need to pass to your backend:
-            var id_token = googleUser.getAuthResponse().id_token;
-            console.log("ID Token: " + id_token);
-          };
-        </script>
       </div>
     </li>
   </ul>
@@ -75,8 +49,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+  <!-- <script type='text/javascript' src='/js/config.js'></script> -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="/js/main.js"></script>
+  <script src="/js/client.js"></script>
 </body>
 
 </html>
