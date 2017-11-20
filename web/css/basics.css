@@ -79,6 +79,20 @@ ul {
   font-size: 200%;
 }
 
+.join.page .label {
+  margin-top: 10px;
+  color: #fff;
+  font-size: 100%;
+  text-align: right;
+  float: left;
+}
+
+.join.page .input {
+  margin-top: 10px;
+  color: #000;
+  font-size: 100%;
+}
+
 .join.page select {
   color: #000;
   font-size: 150%;

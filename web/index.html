@@ -26,10 +26,44 @@
       <!-- <input class="inputMessage" placeholder="Type here..."/> -->
     </li>
 
+
     <li class="join page">
       <h3 class="title">Join a study space to find classmates!</h3>
-      <button id="coryHall" class="btn btn-primary">Cory Hall</button>
+      <div/>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label class="label" for="topic">Topic:</label>
+          <input id="topic" name="topic" class="input form-control" type="text" placeholder="Which class or topic?"/>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="category">Category:</label>
+          <select id="category" name="category" class="input form-control" >
+            <option>Homework</option>
+            <option>Project</option>
+            <option>Debugging</option>
+            <option>Concepts</option>
+            <option>Advice</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="status">Status:</label>
+          <label class="label col-sm-4 radio-inline">
+            <input id="status" name="status" type="radio" checked>Looking for help
+          </label>
+          <label class="label col-sm-4 radio-inline">
+            <input id="status" name="status" type="radio">Offering help
+          </label>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <button id="coryHall" class="btn btn-primary">Cory Hall</button>
+      </div>
     </li>
+
 
     <li class="login page">
       <h3 class="title">Welcome to Course Connect!</h3>
