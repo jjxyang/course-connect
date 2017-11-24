@@ -156,15 +156,16 @@ io.on('connection', function(socket) {
     //consolidate and compile received client data to a set
     socket.on('add user', function addUser(info) {
       var googleUser = info.googleUser;
-      var publicUserID = googleUser; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var publicUserID = info.googleUserID;
+      var email = info.gmail;
       var studySpace = info.studySpace;
       var posting = info.posting;
 
       if(spaceDict[studySpace] == null){
-        googleDict[publicUserID] = [googleUser, socket];
+        googleDict[publicUserID] = [googleUser, socket, gmail];
         spaceDict[studySpace] = [publicUserID, posting];
       }else{
-        googleDict[publicUserID] = [googleUser, socket];
+        googleDict[publicUserID] = [googleUser, socket, gmail];
         spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [publicUserID, posting]); //combine lists and update
       }
   });
@@ -173,7 +174,7 @@ io.on('connection', function(socket) {
 
     socket.on('remove user', function removeUser(info){
       var googleUser = info.googleUser;
-      var publicUserID = googleUser; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
       var studySpace = info.studySpace;
       var posting = info.posting;
 
@@ -193,7 +194,7 @@ io.on('connection', function(socket) {
 
     socket.on('update posting', function updatePosting(info) {
       var googleUser = info.googleUser;
-      var publicUserID = googleUser; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
       var studySpace = info.studySpace;
       var posting = info.posting;
 
@@ -238,7 +239,7 @@ io.on('connection', function(socket) {
     socket.on('accept ping', function receiveAck(info){
       var userID = info.publicUserID;
       var personID = info.publicPersonID;
-      var email = googleDict[userID][0].email; //NOTE: email not properly defined!
+      var email = googleDict[userID][2];
 
       googleDict[personID][1].emit('receive ack', {publicUserID: userID, emailInfo: email});            
 
