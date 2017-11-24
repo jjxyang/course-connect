@@ -100,115 +100,151 @@ function server(request, response) {
     response.end();
   }
 }
-var webpage = http.createServer(server);
 
 /*
-      >>>LOCAL VARIABLES<<<
+      >>>VARIABLES<<<
 */
-var userSet = new Set();
-var spaceDict = {};
+var webpage = http.createServer(server);
+var googleDict = {}; //keeps track of all online users and their connection sockets {userID: [googleUser, socketID]}
+var spaceDict = {'Cory': null}; //stores only publicID info for all users and their corresponding posts
+
 
 /*
-      >>>LISTEN REQUESTS<<<
+      >>>SERVER HELPER FUNCTIONS<<<
+*/
+function getNumPeople(){
+  var spaceDictNumPeople = {};
+
+  for(var key in spaceDict){
+    var value = spaceDict[key];
+
+    if(value == null){
+      spaceDictNumPeople[key] = 0;
+    }else{
+    spaceDictNumPeople[key] = value.length;
+    }
+  }
+  return spaceDictNumPeople;
+}
+
+
+/*
+      >>>SOCKETS<<<
 */
 //your socket.io has a function "listen" where it listens to webpage for it to know what to do next
 var io = require('socket.io').listen(webpage);
 
 io.on('connection', function(socket) {
     // Use socket to communicate with this particular client only, sending it it's own id
+    //will need to use json-sockets with this
     socket.emit('welcome', {message: 'Welcome to CourseConnect!'});
+
+
+
+    //send to the client the list of users of each user every 10 seconds
+    setInterval(
+      function peopleInSpaces() {
+      //returns key-value pair called "dictionary," which is a dictionary of rooms-numPeople
+      //NOTE: not a JSON object!
+        socket.emit('spaces', {dictionary: getNumPeople()} );
+    }, 10000);
+
+
+
 
     //listen for the userID data
     //consolidate and compile received client data to a set
-    socket.on('add user', addUser(data));
-    socket.on('remove user', removeUser(data));
-    socket.on('update posting', updatePosting(data));
+    socket.on('add user', function addUser(info) {
+      var googleUser = info.googleUser;
+      var publicUserID = googleUser; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var studySpace = info.studySpace;
+      var posting = info.posting;
+
+      if(spaceDict[studySpace] == null){
+        googleDict[publicUserID] = [googleUser, socket];
+        spaceDict[studySpace] = [publicUserID, posting];
+      }else{
+        googleDict[publicUserID] = [googleUser, socket];
+        spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [publicUserID, posting]); //combine lists and update
+      }
+  });
 
 
+
+    socket.on('remove user', function removeUser(info){
+      var googleUser = info.googleUser;
+      var publicUserID = googleUser; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var studySpace = info.studySpace;
+      var posting = info.posting;
+
+      if(spaceDict[studySpace] != null) {
+        var list = spaceDict[studySpace];
+        for(i = 0; i < list.length; i++) {
+          if (list[i][0] == publicUserID) {
+            list.splice(i, 1); //remove the element at this index
+            spaceDict[studySpace] = list; //update the element inside the dictionary
+          }
+        }
+        delete googleDict.publicUserID;
+      }
+    });
+
+
+
+    socket.on('update posting', function updatePosting(info) {
+      var googleUser = info.googleUser;
+      var publicUserID = googleUser; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var studySpace = info.studySpace;
+      var posting = info.posting;
+
+      if(spaceDict[studySpace] != null) {
+        var list = spaceDict[studySpace];
+        var length = list.length;
+        for(i = 0; i < list.length; i++) {
+          if (list[i][0] == publicUserID) {
+            list.splice(i, 1); //remove the element at this index
+          }
+          spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [publicUserID, posting]); //combine lists and update
+        }
+      }
+    });
+
+
+
+    socket.on('chosen space', function getPostingsList(data){
+      var space = data.studySpace;
+
+      setInterval(
+        function showSpaceStuff(){
+          //NOTE: not a JSON!
+          socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space] })
+        }, 10000
+        );
+    });
+
+
+    //user sends ping to person
+    //person receives ping
+    socket.on('send ping', function receivePing(info){
+      var userID = info.publicUserID;
+      var personID = info.publicPersonID;
+
+      googleDict[personID][1].emit('receive ping', {publicUserID: userID});      
+    });
+
+
+    //person (called user below) accepts ping
+    //user (called person below) receives ack
+    socket.on('accept ping', function receiveAck(info){
+      var userID = info.publicUserID;
+      var personID = info.publicPersonID;
+      var email = googleDict[userID][0].email; //NOTE: email not properly defined!
+
+      googleDict[personID][1].emit('receive ack', {publicUserID: userID, emailInfo: email});            
+
+    });
 
 });
-
-
-/*
-      >>>EMIT REQUESTS<<<
-*/
-//aggregates and sends the list of all users found in open clients
-function showOnlineUsers() {
-  //need to modify
-    io.emit('show online users', {dictionary: getNumPeople()} );
-}
-
-//send to the client the list of users of each user every 10 seconds
-setInterval(showOnlineUsers, 10000);
-
-/*
-      >>>SERVER HELPER FUNCTIONS<<<
-*/
-function addUser(info) {
-    var googleUser = info.googleUser;
-    var studySpace = info.studySpace;
-    var posting = info.posting;
-
-    if(spaceDict[studySpace] == null){
-      spaceDict[studySpace] = [googleUser, posting];
-    }else{
-      spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [googleUser, posting]); //combine lists and update
-    }
-}
-
-function removeUser(info){
-  var googleUser = info.googleUser;
-  var studySpace = info.studySpace;
-  var posting = info.posting;
-
-  if(spaceDict[studySpace] != null) {
-    var list = spaceDict[studySpace];
-    for(i = 0; i < list.length; i++) {
-      if (list[i][0] == googleUser) {
-        list.splice(i, 1); //remove the element at this index
-        spaceDict[studySpace] = list; //update the element inside the dictionary
-      }
-    }
-  }
-}
-
-function updatePosting(info) {
-  var googleUser = info.googleUser;
-  var studySpace = info.studySpace;
-  var posting = info.posting;
-
-  if(spaceDict[studySpace] != null) {
-    var list = spaceDict[studySpace];
-    var length = list.length;
-    for(i = 0; i < list.length; i++) {
-      if (list[i][0] == googleUser) {
-        list.splice(i, 1); //remove the element at this index
-      }
-      spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [googleUser, posting]); //combine lists and update
-    }
-  }
-}
-
-function getNumPeople(){
-  var spaceDictNumPeople = {};
-  for(var key in spaceDict){
-    var value = spaceDict[key];
-    spaceDictNumPeople[key] = value.length;
-  }
-  return spaceDictNumPeople;
-}
-
-
-
-
-
-
-
-
-
-
-
-
 
 //webpage has a function "listen" that listens to localhost:3000
 webpage.listen(3000);
