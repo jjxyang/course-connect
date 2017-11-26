@@ -144,13 +144,9 @@ io.on('connection', function(socket) {
     //send to the client the list of users of each user every 10 seconds
     setInterval(
       function peopleInSpaces() {
-      //returns key-value pair called "dictionary," which is a dictionary of rooms-numPeople
-      //NOTE: not a JSON object!
+        //returns key-value pair called "dictionary," which is a dictionary of rooms-numPeople
         socket.emit('spaces', {dictionary: getNumPeople()} );
     }, 10000);
-
-
-
 
     //listen for the userID data
     //consolidate and compile received client data to a set
@@ -217,10 +213,8 @@ io.on('connection', function(socket) {
 
       setInterval(
         function showSpaceStuff(){
-          //NOTE: not a JSON!
           socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space] })
-        }, 10000
-        );
+        }, 10000);
     });
 
 

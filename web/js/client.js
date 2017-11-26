@@ -55,10 +55,7 @@ $(document).ready(function() {
 
     //initial event for 'show space stuff'
     socket.on('show space stuff', spaceStuff);
-
-    console.log("googleUser: " + gUser);
-    // TODO: what's publicUserID
-
+    
     var posting = post();
     if (posting !== undefined) {
       var data = {
@@ -159,21 +156,17 @@ $(document).ready(function() {
     console.log(message);
   });
 
-  //converted back to Dictionary object for good measure
   socket.on('spaces', function readSpaces(info){
-    spaceDictionary = Object.assign({}, info.dictionary);
-
-    //print to console to examine what happened here... should expect a dictionary
-    console.log(spaceDictionary);
+    spaceDictionary = info.dictionary
+    console.log("space dict", spaceDictionary);
   });
 
   //NOTE: I have no idea what to do here.. this isn't done
   function spaceStuff(info){
     //not sure if I have to convert this back into a list?
     var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
-    console.log(postsList); //check to see if it looks like a list of lists
-
     var numberOfPeople = info.numPeople;
+    console.log(info);
 
     //Jessie: need to render data live here
   }
