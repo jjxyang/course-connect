@@ -155,9 +155,9 @@ $(document).ready(function() {
 
   //should reconstruct the dictionary sent from the event 'spaces' for use in client
   socket.on('welcome', function welcomeUser(info){
-    var message = info.welcomeMessage;
+    var message = info.message;
     console.log(message);
-  })
+  });
 
   //converted back to Dictionary object for good measure
   socket.on('spaces', function readSpaces(info){
