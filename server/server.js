@@ -159,11 +159,12 @@ io.on('connection', function(socket) {
 
       if(spaceDict[studySpace] === null || spaceDict[studySpace] === undefined){
         googleDict[publicUserID] = [googleUser, socket, email];
-        spaceDict[studySpace] = [publicUserID, posting];
+        spaceDict[studySpace] = [[publicUserID, posting]];
       }else{
         googleDict[publicUserID] = [googleUser, socket, email];
-        spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [publicUserID, posting]); //combine lists and update
+        spaceDict[studySpace] = Array.prototype.push([publicUserID, posting]);
       }
+      console.log("spaceDict", spaceDict[studySpace]);
   });
 
 
