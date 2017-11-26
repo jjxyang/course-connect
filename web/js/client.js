@@ -25,7 +25,7 @@ $(document).ready(function() {
   var socket = io();
 
   // temp signin button
-  $('#tempSignIn').on('click', function (e) {
+  $('#enter').on('click', function (e) {
     setProfile();
   });
 
