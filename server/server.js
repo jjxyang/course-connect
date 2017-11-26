@@ -161,11 +161,11 @@ io.on('connection', function(socket) {
       var studySpace = info.studySpace;
       var posting = info.posting;
 
-      if(spaceDict[studySpace] == null){
-        googleDict[publicUserID] = [googleUser, socket, gmail];
+      if(spaceDict[studySpace] === null || spaceDict[studySpace] === undefined){
+        googleDict[publicUserID] = [googleUser, socket, email];
         spaceDict[studySpace] = [publicUserID, posting];
       }else{
-        googleDict[publicUserID] = [googleUser, socket, gmail];
+        googleDict[publicUserID] = [googleUser, socket, email];
         spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [publicUserID, posting]); //combine lists and update
       }
   });
@@ -230,7 +230,7 @@ io.on('connection', function(socket) {
       var userID = info.publicUserID;
       var personID = info.publicPersonID;
 
-      googleDict[personID][1].emit('receive ping', {publicUserID: userID});      
+      googleDict[personID][1].emit('receive ping', {publicUserID: userID});
     });
 
 
@@ -241,7 +241,7 @@ io.on('connection', function(socket) {
       var personID = info.publicPersonID;
       var email = googleDict[userID][2];
 
-      googleDict[personID][1].emit('receive ack', {publicUserID: userID, emailInfo: email});            
+      googleDict[personID][1].emit('receive ack', {publicUserID: userID, emailInfo: email});
 
     });
 

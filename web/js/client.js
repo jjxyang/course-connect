@@ -41,7 +41,7 @@ $(document).ready(function() {
     console.log('Given Name: ' + profile.getGivenName());
     console.log("Email: " + profile.getEmail());
     console.log("gUser: " + gUser);
-    console.log("signed in!")
+    console.log("signed in!");
   };
 
 
@@ -60,7 +60,7 @@ $(document).ready(function() {
     // TODO: what's publicUserID
 
     var posting = post();
-    if (posting === true) {
+    if (posting !== undefined) {
       var data = {
         googleUser: gUser,
         googleUserID: gUserID,
@@ -109,7 +109,7 @@ $(document).ready(function() {
       console.log(posting);
 
       userPosting = posting;
-      return true;
+      return posting
     }
   }
 
@@ -222,44 +222,6 @@ $(document).ready(function() {
       //accept the ping
       socket.emit('accept ping', {publicUserID: gUserID, publicPersonID: somePersonID});
     }
-
   });
 
-
-
-
-
-
-// OLD THINGS
-//   // Whenever the server emits 'new message', update the chat body
-//   socket.on('new message', function (data) {
-//     addChatMessage(data);
-//   });
-
-//   // Whenever the server emits 'user joined', log it in the chat body
-//   socket.on('user joined', function (data) {
-//     log(data.username + ' joined');
-//     addParticipantsMessage(data);
-//   });
-
-//   // Whenever the server emits 'user left', log it in the chat body
-//   socket.on('user left', function (data) {
-//     log(data.username + ' left');
-//     addParticipantsMessage(data);
-//   });
-
-//   socket.on('disconnect', function () {
-//     log('you have been disconnected');
-//   });
-
-//   socket.on('reconnect', function () {
-//     log('you have been reconnected');
-//     if (username) {
-//       socket.emit('add user', username);
-//     }
-//   });
-
-//   socket.on('reconnect_error', function () {
-//     log('attempt to reconnect has failed');
-//   });
-// });
+}); // closure
