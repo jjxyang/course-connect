@@ -106,8 +106,14 @@ function server(request, response) {
 */
 var webpage = http.createServer(server);
 var googleDict = {}; //keeps track of all online users and their connection sockets {userID: [googleUser, socketID]}
-var spaceDict = {'Cory': null}; //stores only publicID info for all users and their corresponding posts
-
+//stores only publicID info for all users and their corresponding posts
+var spaceDict = {
+  'Cory Hall': null,
+  'Soda Hall': null,
+  'MLK Student Union': null,
+  'Moffitt Library': null,
+  'Doe Library': null
+};
 
 /*
       >>>SERVER HELPER FUNCTIONS<<<

@@ -50,7 +50,7 @@ $(document).ready(function() {
   //H: should RENDER all of the postings the server emits back to client
   // temp "join cory hall study space button"
   $('#coryHall').on('click', function (e) {
-    chosenSpace = 'Cory'
+    chosenSpace = 'Cory Hall'
     socket.emit('chosen space', {studySpace: chosenSpace});
 
     //initial event for 'show space stuff'
