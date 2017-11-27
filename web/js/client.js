@@ -141,7 +141,32 @@ $(document).ready(function() {
     var numberOfPeople = info.numPeople;
     console.log(info);
 
-    //Jessie: need to render data live here
+    // clear div and re-render each item in postsList
+    $('#postings').empty();
+
+    for (var idx in postsList) {
+      // var id = ($('#postings').length + 1).toString();
+      var userID = postsList[idx][0];
+      var posting = postsList[idx][1];
+
+      // create and append div element for each posting
+      $('#postings').append(
+        '<div class="panel panel-primary">' +
+          '<ul class="list-group">' +
+            '<li class="list-group-item">' +
+              posting.name + " is " +
+              posting.status + " on " +
+              posting.category + " for " +
+              posting.topic +
+            '</li>' +
+          '</ul>' +
+          '<div class="panel-body">' +
+            '<button class="btn btn-info">' +
+            'Connect</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }
   }
 
   //this is the second place that I have the event 'show space stuff'
