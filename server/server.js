@@ -168,7 +168,7 @@ io.on('connection', function(socket) {
         spaceDict[studySpace] = [[publicUserID, posting]];
       }else{
         googleDict[publicUserID] = [googleUser, socket, email];
-        spaceDict[studySpace] = Array.prototype.push([publicUserID, posting]);
+        spaceDict[studySpace].push([publicUserID, posting]);
       }
       console.log("spaceDict", spaceDict[studySpace]);
   });
@@ -208,7 +208,7 @@ io.on('connection', function(socket) {
           if (list[i][0] == publicUserID) {
             list.splice(i, 1); //remove the element at this index
           }
-          spaceDict[studySpace] = Array.prototype.push.apply(spaceDict[studySpace], [publicUserID, posting]); //combine lists and update
+          spaceDict[studySpace].push([publicUserID, posting]);
         }
       }
     });
