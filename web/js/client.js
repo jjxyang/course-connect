@@ -13,7 +13,6 @@ $(document).ready(function() {
   var email;
   var chosenSpace;
   var userPosting = null;
-  var username;
   var connected = false;
 
   var socket = io();
@@ -176,11 +175,19 @@ $(document).ready(function() {
             '</li>' +
           '</ul>' +
           '<div class="panel-body">' +
-            '<button class="btn btn-info">' +
-            'Connect</button>' +
+            '<button class="btn btn-info" id="' + userID + '">' +
+              'Connect with ' + posting.name +
+            '</button>' +
           '</div>' +
         '</div>'
       );
+
+      // unbind existing click listeners
+      $('#postings').off('click', '#' + userID);
+      // add new click listener to the 'connect' button of each div
+      $('#postings').on('click', '#' + userID, function (e) {
+        requestConnection(userID, posting.name);
+      });
     }
   };
 
@@ -200,12 +207,12 @@ $(document).ready(function() {
     socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
   }
 
-  //NOTE: Jessie, you'll want to implement this somewhere
-  //USER wants to connect to SOMEONE
-  //this will need to be called somewhere, where an onclick listener selects the otherUser's ID that they want to connect
-  //will need to be implemented by Jessie
-  function requestConnection(otherUserID){
-    socket.emit('send ping', {publicUserID: gUserID, publicPersonID: otherUserID});
+  // THIS USER wants to connect to SOMEONE ELSE
+  function requestConnection(otherUserID, otherUserName) {
+    console.log("requesting connection with", otherUserName);
+    var name = gUser.getBasicProfile().getName();
+    socket.emit('send ping', {userName: name, publicUserID: gUserID, publicPersonID: otherUserID});
+    alert("You sent a ping to " + otherUserName + "!");
   }
 
   //NOTE: Jessie, you might want to display the information in here in another window

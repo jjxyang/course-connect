@@ -191,7 +191,6 @@ io.on('connection', function(socket) {
     });
 
 
-
     socket.on('update posting', function updatePosting(info) {
       var googleUser = info.googleUser;
       var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
@@ -207,7 +206,6 @@ io.on('connection', function(socket) {
     });
 
 
-
     socket.on('chosen space', function getPostingsList(data){
       var space = data.studySpace;
 
@@ -218,13 +216,12 @@ io.on('connection', function(socket) {
     });
 
 
-    //user sends ping to person
-    //person receives ping
+    // "user" sent ping to "person"; "person" receives ping
     socket.on('send ping', function receivePing(info){
+      var name = info.userName;
       var userID = info.publicUserID;
       var personID = info.publicPersonID;
-
-      googleDict[personID][1].emit('receive ping', {publicUserID: userID});
+      googleDict[personID][1].emit('receive ping', {publicUserID: userID, requestorName: name});
     });
 
 
@@ -236,7 +233,6 @@ io.on('connection', function(socket) {
       var email = googleDict[userID][2];
 
       googleDict[personID][1].emit('receive ack', {publicUserID: userID, emailInfo: email});
-
     });
 
 });
