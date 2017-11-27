@@ -215,26 +215,38 @@ $(document).ready(function() {
     alert("You sent a ping to " + otherUserName + "!");
   }
 
-  //NOTE: Jessie, you might want to display the information in here in another window
-  socket.on('receive ack', function receiveAck(info){
-    var otherEmail = info.emailInfo;
-    var otherPersonID = info.publicUserID;
+  // SOMEONE wants to connect to this USER
+  // receive a ping that someone sent you. You can either ACCEPT or REJECT
+  socket.on('receive ping', function receivePing(info){
+    var otherID = info.publicPersonID;
+    var otherName = info.requestorName;
+    var name = gUser.getBasicProfile().getName();
+    console.log("received ping from", otherName);
+
+    // unbind listeners first
+    $('#acceptPing').off('click');
+    $('#ignorePing').off('click');
+    
+    // functions for USER to accept or ignore ping from OTHER;
+    $('#acceptPing').on('click', function (e) {
+      socket.emit('accept ping', {userName: name, publicUserID: gUserID, publicPersonID: otherID});
+      $('#receivePing').css("display", "none");
+    });
+    $('#ignorePing').on('click', function (e) {
+      $('#receivePing').css("display", "none");
+    });
+
+    // display the ping
+    $('#receivePingText').text(otherName + " wants to meet up with you!");
+    $('#receivePing').css("display", "block");
   });
 
+  socket.on('receive ack', function receiveAck(info){
+    var otherName = info.personName;
+    var otherEmail = info.emailInfo;
 
-  //NOTE: Jessie, you'll need to do something here too
-  //SOMEONE wants to connect to the USER
-  //receive a ping that someone sent you. You can either ACCEPT or REJECT
-  socket.on('receive ping', function receivePing(info){
-    var somePersonID = info.publicPersonID;
-
-    //TODO: some message that pops up in the tab that indicates someone wants to connect
-    var decision = null; //make this dependent on the event listener for whether to accept (true) or reject (false) the request
-
-    if(decision === true){
-      //accept the ping
-      socket.emit('accept ping', {publicUserID: gUserID, publicPersonID: somePersonID});
-    }
+    // TODO: what's a "longer-lasting" solution?
+    alert(otherName + " wants to meet with you, too! Their email is: " + otherEmail);
   });
 
 }); // closure
