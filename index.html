@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="579097782251-5gu8lp3m2act1277smb5u1j29hiu38ri.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <title>Course Connect</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Custom stylesheets -->
+    <link href="css/basics.css" rel="stylesheet">
+</head>
+
+<body>
+  <ul class="pages">
+    <li class="connect page">
+      <div class="studySpaceArea">
+        <h3 class="title">Cory Hall</h3>
+        <!-- <ul class="messages"></ul> -->
+      </div>
+      <!-- <input class="inputMessage" placeholder="Type here..."/> -->
+    </li>
+
+    <li class="join page">
+      <h3 class="title">Join a study space to find classmates!</h3>
+      <button id="coryHall" class="btn btn-primary">Cory Hall</button>
+    </li>
+
+    <li class="login page">
+      <h3 class="title">Welcome to Course Connect!</h3>
+      <h3 class="title">Find where your classmates are and study with them!</h3>
+      <h3 class="title">Please log in...</h3>
+      <button class="btn btn-primary" id="tempSignIn">Temp Sign-in</button>
+
+      <!-- Google OAuth -->
+      <div class="col-md-12 text-center">
+        <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+      </div>
+    </li>
+  </ul>
+
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <!-- <script type='text/javascript' src='/js/config.js'></script> -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/client.js"></script>
+</body>
+
+</html>
