@@ -180,7 +180,7 @@ io.on('connection', function(socket) {
       var studySpace = info.studySpace;
       var posting = info.posting;
 
-      if(spaceDict[studySpace] !== null) {
+      if(spaceDict[studySpace] != null && spaceDict[studySpace] != undefined) {
         // remove the user in this space by publicUserID
         var list = spaceDict[studySpace];
         spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
@@ -196,7 +196,7 @@ io.on('connection', function(socket) {
       var studySpace = info.studySpace;
       var posting = info.posting;
 
-      if (spaceDict[studySpace] !== null) {
+      if (spaceDict[studySpace] != null && spaceDict[studySpace] != undefined) {
         var list = spaceDict[studySpace];
         // remove the user in this space by publicUserID, then push updated posting
         spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
