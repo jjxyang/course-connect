@@ -174,21 +174,16 @@ io.on('connection', function(socket) {
   });
 
 
-
     socket.on('remove user', function removeUser(info){
       var googleUser = info.googleUser;
       var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
       var studySpace = info.studySpace;
       var posting = info.posting;
 
-      if(spaceDict[studySpace] != null) {
+      if(spaceDict[studySpace] !== null) {
+        // remove the user in this space by publicUserID
         var list = spaceDict[studySpace];
-        for(i = 0; i < list.length; i++) {
-          if (list[i][0] == publicUserID) {
-            list.splice(i, 1); //remove the element at this index
-            spaceDict[studySpace] = list; //update the element inside the dictionary
-          }
-        }
+        spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
         delete googleDict.publicUserID;
       }
     });
@@ -201,15 +196,11 @@ io.on('connection', function(socket) {
       var studySpace = info.studySpace;
       var posting = info.posting;
 
-      if(spaceDict[studySpace] != null) {
+      if (spaceDict[studySpace] !== null) {
+        // remove the user in this space by publicUserID
         var list = spaceDict[studySpace];
-        var length = list.length;
-        for(i = 0; i < list.length; i++) {
-          if (list[i][0] == publicUserID) {
-            list.splice(i, 1); //remove the element at this index
-          }
-          spaceDict[studySpace].push([publicUserID, posting]);
-        }
+        spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
+        spaceDict[studySpace].push([publicUserID, posting]);
       }
     });
 
