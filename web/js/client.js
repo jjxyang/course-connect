@@ -12,7 +12,6 @@ $(document).ready(function() {
   var $joinPage = $('.join.page'); // the join page
   var $connectPage = $('.connect.page'); // the connect page
 
-
   var spaceDictionary = {};
   var gUser;
   var gUserID;
@@ -40,22 +39,19 @@ $(document).ready(function() {
     console.log('Full Name: ' + profile.getName());
     console.log('Given Name: ' + profile.getGivenName());
     console.log("Email: " + profile.getEmail());
-    console.log("gUser: " + gUser);
     console.log("signed in!");
   };
 
 
-
   //H: emits the chosen space to the server
   //H: should RENDER all of the postings the server emits back to client
-  // temp "join cory hall study space button"
   $('#coryHall').on('click', function (e) {
     chosenSpace = 'Cory Hall'
     socket.emit('chosen space', {studySpace: chosenSpace});
 
     //initial event for 'show space stuff'
     socket.on('show space stuff', spaceStuff);
-    
+
     var posting = post();
     if (posting !== undefined) {
       var data = {
@@ -74,13 +70,8 @@ $(document).ready(function() {
     }
   });
 
-//H: Actual space-reading stuff to implement here:
-
-
-
-  //H: edited to be useful for both createPost and editPost actions.
-  //Whenever a user wants to edit a post, it is safe to reuse this function
-  // Sets the client's google profile
+  // Useful for both createPost and editPost actions.
+  // Whenever a user wants to edit a post, it is safe to reuse this function
   function post() {
     var name = gUser.getBasicProfile().getGivenName();
     var topic = $('#topic').val();
@@ -103,8 +94,6 @@ $(document).ready(function() {
         category: category,
         status: status
       }
-      console.log(posting);
-
       userPosting = posting;
       return posting
     }
@@ -114,7 +103,6 @@ $(document).ready(function() {
   function setProfile () {
     email = gUser.getBasicProfile().getEmail();
     console.log("setting profile");
-    console.log("gUser: " + gUser);
 
     // If the email is valid, fade out page
     if (email.indexOf("@berkeley.edu") !== -1) {
@@ -124,7 +112,6 @@ $(document).ready(function() {
       $loginPage.off('click');
     } else {
       alert("Sorry, you're not a Berkeley student!");
-      console.log("you're not a berkeley student O:<");
     }
   }
 
@@ -132,19 +119,6 @@ $(document).ready(function() {
   function cleanInput (input) {
     return $('<div/>').text(input).html();
   }
-
-  // Gets the color of a username through our hash function
-  function getUsernameColor (username) {
-    // Compute hash code
-    var hash = 7;
-    for (var i = 0; i < username.length; i++) {
-       hash = username.charCodeAt(i) + (hash << 5) - hash;
-    }
-    // Calculate color
-    var index = Math.abs(hash % COLORS.length);
-    return COLORS[index];
-  }
-
 
 
 
@@ -161,7 +135,6 @@ $(document).ready(function() {
     console.log("space dict", spaceDictionary);
   });
 
-  //NOTE: I have no idea what to do here.. this isn't done
   function spaceStuff(info){
     //not sure if I have to convert this back into a list?
     var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
@@ -171,10 +144,8 @@ $(document).ready(function() {
     //Jessie: need to render data live here
   }
 
-  //I think this is right? Not sure
   //this is the second place that I have the event 'show space stuff'
   socket.on('show space stuff', spaceStuff);
-
 
   //should emit the event 'remove user' to server
   window.addEventListener("beforeunload", function (e) {

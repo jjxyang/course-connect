@@ -197,8 +197,8 @@ io.on('connection', function(socket) {
       var posting = info.posting;
 
       if (spaceDict[studySpace] !== null) {
-        // remove the user in this space by publicUserID
         var list = spaceDict[studySpace];
+        // remove the user in this space by publicUserID, then push updated posting
         spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
         spaceDict[studySpace].push([publicUserID, posting]);
       }
