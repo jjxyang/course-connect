@@ -25,7 +25,11 @@ $(document).ready(function() {
   // google auth signin
   window.onSignIn = function (googleUser) {
     // save off the googleUser
+    // TODO: is this secure?
     gUser = googleUser;
+    // TODO: deal with auth/security concerns re: google id's
+    // https://developers.google.com/identity/sign-in/web/people
+    // https://developers.google.com/identity/sign-in/web/backend-auth
     gUserID = gUser.getBasicProfile().getId();
 
     var profile = googleUser.getBasicProfile();
@@ -63,7 +67,6 @@ $(document).ready(function() {
   function showStudySpace(chosenSpace) {
     console.log("going to study space", chosenSpace);
     socket.emit('chosen space', {studySpace: chosenSpace});
-    socket.on('show space stuff', spaceStuff);
 
     // set title of page to be the chosen studySpace
     $("#studySpaceName").text(chosenSpace);
@@ -137,9 +140,6 @@ $(document).ready(function() {
   }
 
 
-
-  //<<<Howe's Client-side Socket Code>>>
-
   //should reconstruct the dictionary sent from the event 'spaces' for use in client
   socket.on('welcome', function welcomeUser(info){
     var message = info.message;
@@ -148,14 +148,11 @@ $(document).ready(function() {
 
   socket.on('spaces', function readSpaces(info){
     spaceDictionary = info.dictionary
-    console.log("space dict", spaceDictionary);
   });
 
   function spaceStuff(info){
-    //not sure if I have to convert this back into a list?
     var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
     var numberOfPeople = info.numPeople;
-    console.log(info);
 
     // clear div and re-render each item in postsList
     $('#postings').empty();
@@ -191,7 +188,6 @@ $(document).ready(function() {
     }
   };
 
-  //this is the second place that I have the event 'show space stuff'
   socket.on('show space stuff', spaceStuff);
 
   //should emit the event 'remove user' to server
@@ -199,13 +195,6 @@ $(document).ready(function() {
     socket.emit('remove user', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
     return;
   });
-
-  //function call to editPost
-  // TODO: finish implementation
-  function editPost(){
-    post();
-    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
-  }
 
   // THIS USER wants to connect to SOMEONE ELSE
   function requestConnection(otherUserID, otherUserName) {
@@ -248,5 +237,12 @@ $(document).ready(function() {
     // TODO: what's a "longer-lasting" solution?
     alert(otherName + " wants to meet with you, too! Their email is: " + otherEmail);
   });
+
+  //function call to editPost
+  // TODO: finish implementation
+  function editPost(){
+    post();
+    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  }
 
 }); // closure
