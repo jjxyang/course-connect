@@ -1,10 +1,5 @@
 $(document).ready(function() {
   var FADE_TIME = 150; // ms
-  var COLORS = [
-    '#e21400', '#91580f', '#f8a700', '#f78b00',
-    '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-    '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
-  ];
 
   // Initialize variables
   var $window = $(window);
@@ -42,23 +37,45 @@ $(document).ready(function() {
     console.log("signed in!");
   };
 
-
-  //H: emits the chosen space to the server
-  //H: should RENDER all of the postings the server emits back to client
+  // takes user to the chosen space
   $('#coryHall').on('click', function (e) {
-    chosenSpace = 'Cory Hall'
-    socket.emit('chosen space', {studySpace: chosenSpace});
+    chosenSpace = 'Cory Hall';
+    showStudySpace(chosenSpace);
+  });
+  $('#sodaHall').on('click', function (e) {
+    chosenSpace = 'Soda Hall';
+    showStudySpace(chosenSpace);
+  });
+  $('#mlk').on('click', function (e) {
+    chosenSpace = 'MLK Student Union';
+    showStudySpace(chosenSpace);
+  });
+  $('#moffittLibrary').on('click', function (e) {
+    chosenSpace = 'Moffitt Library';
+    showStudySpace(chosenSpace);
+  });
+  $('#doeLibrary').on('click', function (e) {
+    chosenSpace = 'Doe Library';
+    showStudySpace(chosenSpace);
+  });
 
-    //initial event for 'show space stuff'
+
+  // emits user's chosen space and posting to the server
+  function showStudySpace(chosenSpace) {
+    console.log("going to study space", chosenSpace);
+    socket.emit('chosen space', {studySpace: chosenSpace});
     socket.on('show space stuff', spaceStuff);
 
+    // set title of page to be the chosen studySpace
+    $("#studySpaceName").text(chosenSpace);
+
     var posting = post();
-    if (posting !== undefined) {
+    if (posting !== undefined && posting !== null) {
       var data = {
         googleUser: gUser,
         googleUserID: gUserID,
         gmail: email,
-        studySpace: "Cory Hall",
+        studySpace: chosenSpace,
         posting: posting
       };
       console.log("adding user");
@@ -68,7 +85,7 @@ $(document).ready(function() {
       $connectPage.show();
       $joinPage.off('click');
     }
-  });
+  }
 
   // Useful for both createPost and editPost actions.
   // Whenever a user wants to edit a post, it is safe to reuse this function
@@ -143,9 +160,7 @@ $(document).ready(function() {
 
     // clear div and re-render each item in postsList
     $('#postings').empty();
-
     for (var idx in postsList) {
-      // var id = ($('#postings').length + 1).toString();
       var userID = postsList[idx][0];
       var posting = postsList[idx][1];
 
@@ -167,7 +182,7 @@ $(document).ready(function() {
         '</div>'
       );
     }
-  }
+  };
 
   //this is the second place that I have the event 'show space stuff'
   socket.on('show space stuff', spaceStuff);
@@ -175,9 +190,11 @@ $(document).ready(function() {
   //should emit the event 'remove user' to server
   window.addEventListener("beforeunload", function (e) {
     socket.emit('remove user', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    return;
   });
 
   //function call to editPost
+  // TODO: finish implementation
   function editPost(){
     post();
     socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});

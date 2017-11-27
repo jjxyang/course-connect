@@ -104,6 +104,11 @@ ul {
   display: none;
 }
 
+.spaceButton {
+  margin-bottom: 10px;
+  font-size: 120%;
+}
+
 /* Font */
 .messages {
   font-size: 150%;

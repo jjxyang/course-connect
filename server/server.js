@@ -127,7 +127,7 @@ function getNumPeople(){
     if(value == null){
       spaceDictNumPeople[key] = 0;
     }else{
-    spaceDictNumPeople[key] = value.length;
+      spaceDictNumPeople[key] = value.length;
     }
   }
   return spaceDictNumPeople;
