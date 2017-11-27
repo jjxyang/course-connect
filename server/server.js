@@ -164,14 +164,16 @@ io.on('connection', function(socket) {
       var posting = info.posting;
 
       if(spaceDict[studySpace] === null || spaceDict[studySpace] === undefined){
-        googleDict[publicUserID] = [googleUser, socket, email];
         spaceDict[studySpace] = [[publicUserID, posting]];
       }else{
-        googleDict[publicUserID] = [googleUser, socket, email];
+        // if user already exists, remove it (so it can later be replaced)
+        if (publicUserID in spaceDict[studySpace]) {
+          spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
+        }
         spaceDict[studySpace].push([publicUserID, posting]);
       }
-      console.log("spaceDict", spaceDict[studySpace]);
-  });
+      googleDict[publicUserID] = [googleUser, socket, email];
+    });
 
 
     socket.on('remove user', function removeUser(info){
