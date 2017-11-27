@@ -1,112 +1,134 @@
 $(document).ready(function() {
   var FADE_TIME = 150; // ms
-  var COLORS = [
-    '#e21400', '#91580f', '#f8a700', '#f78b00',
-    '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-    '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
-  ];
 
   // Initialize variables
   var $window = $(window);
-  var $loginPage = $('.login.page'); // The login page
-  var $connectPage = $('.connect.page'); // The chatroom page
+  var $loginPage = $('.login.page'); // the login page
+  var $joinPage = $('.join.page'); // the join page
+  var $connectPage = $('.connect.page'); // the connect page
 
-  var googleProfile;
-  var username;
+  var spaceDictionary = {};
+  var gUser;
+  var gUserID;
+  var email;
+  var chosenSpace;
+  var userPosting = null;
   var connected = false;
 
   var socket = io();
 
   // temp signin button
-  $('#tempSignIn').on('click', function (e) {
-    setUsername();
+  $('#enter').on('click', function (e) {
+    setProfile();
   });
 
   // google auth signin
   window.onSignIn = function (googleUser) {
     // save off the googleUser
-    googleProfile = googleUser;
+    gUser = googleUser;
+    gUserID = gUser.getBasicProfile().getId();
+
     var profile = googleUser.getBasicProfile();
+    var email = profile.getEmail();
     console.log('Full Name: ' + profile.getName());
     console.log('Given Name: ' + profile.getGivenName());
     console.log("Email: " + profile.getEmail());
-    console.log("googleProfile: " + googleProfile);
-
-    // ID token to pass to backend
-    // var id_token = googleUser.getAuthResponse().id_token;
-    // console.log("ID Token: " + id_token);
+    console.log("signed in!");
   };
 
-  // temp "join cory hall study space button"
+  // takes user to the chosen space
   $('#coryHall').on('click', function (e) {
-    console.log("googleUser: " + googleProfile);
-    socket.emit("add user", {googleUser: googleProfile, studySpace: "Cory Hall"});
+    chosenSpace = 'Cory Hall';
+    showStudySpace(chosenSpace);
   });
+  $('#sodaHall').on('click', function (e) {
+    chosenSpace = 'Soda Hall';
+    showStudySpace(chosenSpace);
+  });
+  $('#mlk').on('click', function (e) {
+    chosenSpace = 'MLK Student Union';
+    showStudySpace(chosenSpace);
+  });
+  $('#moffittLibrary').on('click', function (e) {
+    chosenSpace = 'Moffitt Library';
+    showStudySpace(chosenSpace);
+  });
+  $('#doeLibrary').on('click', function (e) {
+    chosenSpace = 'Doe Library';
+    showStudySpace(chosenSpace);
+  });
+
+
+  // emits user's chosen space and posting to the server
+  function showStudySpace(chosenSpace) {
+    console.log("going to study space", chosenSpace);
+    socket.emit('chosen space', {studySpace: chosenSpace});
+    socket.on('show space stuff', spaceStuff);
+
+    // set title of page to be the chosen studySpace
+    $("#studySpaceName").text(chosenSpace);
+
+    var posting = post();
+    if (posting !== undefined && posting !== null) {
+      var data = {
+        googleUser: gUser,
+        googleUserID: gUserID,
+        gmail: email,
+        studySpace: chosenSpace,
+        posting: posting
+      };
+      console.log("adding user");
+      socket.emit("add user", data);
+
+      $joinPage.fadeOut();
+      $connectPage.show();
+      $joinPage.off('click');
+    }
+  }
+
+  // Useful for both createPost and editPost actions.
+  // Whenever a user wants to edit a post, it is safe to reuse this function
+  function post() {
+    var name = gUser.getBasicProfile().getGivenName();
+    var topic = $('#topic').val();
+    var category = $('#category').val();
+    var status = $('input[name=status]:checked', '#statusChoice').val();
+
+    // format name
+    name = name.toLowerCase();
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    topic = cleanInput(topic);
+
+    // verify topic is not empty
+    if (topic === "") {
+      alert("Please choose a class or topic.");
+      return undefined;
+    } else {
+      var posting = {
+        name: name,
+        topic: topic,
+        category: category,
+        status: status
+      }
+      userPosting = posting;
+      return posting
+    }
+  }
 
   // Sets the client's google profile
   function setProfile () {
-    // TODO: verify that the google email is a berkeley email
-    // TODO: save the google profile as googleProfile
+    email = gUser.getBasicProfile().getEmail();
+    console.log("setting profile");
 
     // If the email is valid, fade out page
-    if (email) {
+    if (email.indexOf("@berkeley.edu") !== -1) {
+      console.log("yay you're a berkeley student")
       $loginPage.fadeOut();
-      $connectPage.show();
+      $joinPage.show();
       $loginPage.off('click');
-    }
-  }
-
-  // Sets the client's username
-  function setUsername () {
-    username = cleanInput("first".trim());
-    console.log("setting username: " + username);
-
-    // If the username is valid
-    if (username) {
-      $loginPage.fadeOut();
-      $connectPage.show();
-      $loginPage.off('click');
-
-      // Tell the server your username
-      socket.emit('add user', username);
-    }
-  }
-
-  // Log a message
-  function log (message, options) {
-    var $el = $('<li>').addClass('log').text(message);
-    addMessageElement($el, options);
-  }
-
-  // Adds a message element to the messages and scrolls to the bottom
-  // el - The element to add as a message
-  // options.fade - If the element should fade-in (default = true)
-  // options.prepend - If the element should prepend
-  //   all other messages (default = false)
-  function addMessageElement (el, options) {
-    var $el = $(el);
-
-    // Setup default options
-    if (!options) {
-      options = {};
-    }
-    if (typeof options.fade === 'undefined') {
-      options.fade = true;
-    }
-    if (typeof options.prepend === 'undefined') {
-      options.prepend = false;
-    }
-
-    // Apply options
-    if (options.fade) {
-      $el.hide().fadeIn(FADE_TIME);
-    }
-    if (options.prepend) {
-      $messages.prepend($el);
     } else {
-      $messages.append($el);
+      alert("Sorry, you're not a Berkeley student!");
     }
-    $messages[0].scrollTop = $messages[0].scrollHeight;
   }
 
   // Prevents input from having injected markup
@@ -114,60 +136,105 @@ $(document).ready(function() {
     return $('<div/>').text(input).html();
   }
 
-  // Gets the color of a username through our hash function
-  function getUsernameColor (username) {
-    // Compute hash code
-    var hash = 7;
-    for (var i = 0; i < username.length; i++) {
-       hash = username.charCodeAt(i) + (hash << 5) - hash;
+
+
+  //<<<Howe's Client-side Socket Code>>>
+
+  //should reconstruct the dictionary sent from the event 'spaces' for use in client
+  socket.on('welcome', function welcomeUser(info){
+    var message = info.message;
+    console.log(message);
+  });
+
+  socket.on('spaces', function readSpaces(info){
+    spaceDictionary = info.dictionary
+    console.log("space dict", spaceDictionary);
+  });
+
+  function spaceStuff(info){
+    //not sure if I have to convert this back into a list?
+    var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
+    var numberOfPeople = info.numPeople;
+    console.log(info);
+
+    // clear div and re-render each item in postsList
+    $('#postings').empty();
+    for (var idx in postsList) {
+      var userID = postsList[idx][0];
+      var posting = postsList[idx][1];
+
+      // create and append div element for each posting
+      $('#postings').append(
+        '<div class="panel panel-primary">' +
+          '<ul class="list-group">' +
+            '<li class="list-group-item">' +
+              posting.name + " is " +
+              posting.status + " on " +
+              posting.category + " for " +
+              posting.topic +
+            '</li>' +
+          '</ul>' +
+          '<div class="panel-body">' +
+            '<button class="btn btn-info" id="' + userID + '">' +
+              'Connect with ' + posting.name +
+            '</button>' +
+          '</div>' +
+        '</div>'
+      );
+
+      // unbind existing click listeners
+      $('#postings').off('click', '#' + userID);
+      // add new click listener to the 'connect' button of each div
+      $('#postings').on('click', '#' + userID, function (e) {
+        requestConnection(userID, posting.name);
+      });
     }
-    // Calculate color
-    var index = Math.abs(hash % COLORS.length);
-    return COLORS[index];
+  };
+
+  //this is the second place that I have the event 'show space stuff'
+  socket.on('show space stuff', spaceStuff);
+
+  //should emit the event 'remove user' to server
+  window.addEventListener("beforeunload", function (e) {
+    socket.emit('remove user', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    return;
+  });
+
+  //function call to editPost
+  // TODO: finish implementation
+  function editPost(){
+    post();
+    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
   }
 
-  // Socket events
+  // THIS USER wants to connect to SOMEONE ELSE
+  function requestConnection(otherUserID, otherUserName) {
+    console.log("requesting connection with", otherUserName);
+    var name = gUser.getBasicProfile().getName();
+    socket.emit('send ping', {userName: name, publicUserID: gUserID, publicPersonID: otherUserID});
+    alert("You sent a ping to " + otherUserName + "!");
+  }
 
-  // Whenever the server emits 'login', log the login message
-  // socket.on('login', function (data) {
-  //   connected = true;
-  //   // Display the welcome message
-  //   var message = "Welcome to Socket.IO Chat – ";
-  //   log(message, {
-  //     prepend: true
-  //   });
-  //   addParticipantsMessage(data);
-  // });
-
-  // Whenever the server emits 'new message', update the chat body
-  socket.on('new message', function (data) {
-    addChatMessage(data);
+  //NOTE: Jessie, you might want to display the information in here in another window
+  socket.on('receive ack', function receiveAck(info){
+    var otherEmail = info.emailInfo;
+    var otherPersonID = info.publicUserID;
   });
 
-  // Whenever the server emits 'user joined', log it in the chat body
-  socket.on('user joined', function (data) {
-    log(data.username + ' joined');
-    addParticipantsMessage(data);
-  });
 
-  // Whenever the server emits 'user left', log it in the chat body
-  socket.on('user left', function (data) {
-    log(data.username + ' left');
-    addParticipantsMessage(data);
-  });
+  //NOTE: Jessie, you'll need to do something here too
+  //SOMEONE wants to connect to the USER
+  //receive a ping that someone sent you. You can either ACCEPT or REJECT
+  socket.on('receive ping', function receivePing(info){
+    var somePersonID = info.publicPersonID;
 
-  socket.on('disconnect', function () {
-    log('you have been disconnected');
-  });
+    //TODO: some message that pops up in the tab that indicates someone wants to connect
+    var decision = null; //make this dependent on the event listener for whether to accept (true) or reject (false) the request
 
-  socket.on('reconnect', function () {
-    log('you have been reconnected');
-    if (username) {
-      socket.emit('add user', username);
+    if(decision === true){
+      //accept the ping
+      socket.emit('accept ping', {publicUserID: gUserID, publicPersonID: somePersonID});
     }
   });
 
-  socket.on('reconnect_error', function () {
-    log('attempt to reconnect has failed');
-  });
-});
+}); // closure

@@ -1,16 +1,10 @@
 
 /*
-      >>>IMPORTS<<<
+      >>>WEBPAGE IMPORTS<<<
 */
 var http = require('http');
 var fs = require("fs");
 var path = require("path");
-
-
-/*
-      >>>GLOBAL VARIABLES<<<
-*/
-var usersSet = new Set();
 
 /*
       >>>WEBPAGE FUNCTIONS<<<
@@ -107,84 +101,141 @@ function server(request, response) {
   }
 }
 
+/*
+      >>>VARIABLES<<<
+*/
 var webpage = http.createServer(server);
+var googleDict = {}; //keeps track of all online users and their connection sockets {userID: [googleUser, socketID]}
+//stores only publicID info for all users and their corresponding posts
+var spaceDict = {
+  'Cory Hall': null,
+  'Soda Hall': null,
+  'MLK Student Union': null,
+  'Moffitt Library': null,
+  'Doe Library': null
+};
+
+/*
+      >>>SERVER HELPER FUNCTIONS<<<
+*/
+function getNumPeople(){
+  var spaceDictNumPeople = {};
+
+  for(var key in spaceDict){
+    var value = spaceDict[key];
+
+    if(value == null){
+      spaceDictNumPeople[key] = 0;
+    }else{
+      spaceDictNumPeople[key] = value.length;
+    }
+  }
+  return spaceDictNumPeople;
+}
 
 
 /*
-      >>>LISTEN REQUESTS<<<
+      >>>SOCKETS<<<
 */
 //your socket.io has a function "listen" where it listens to webpage for it to know what to do next
 var io = require('socket.io').listen(webpage);
 
 io.on('connection', function(socket) {
     // Use socket to communicate with this particular client only, sending it it's own id
+    //will need to use json-sockets with this
     socket.emit('welcome', {message: 'Welcome to CourseConnect!'});
+
+
+
+    //send to the client the list of users of each user every 10 seconds
+    setInterval(
+      function peopleInSpaces() {
+        //returns key-value pair called "dictionary," which is a dictionary of rooms-numPeople
+        socket.emit('spaces', {dictionary: getNumPeople()} );
+    }, 10000);
 
     //listen for the userID data
     //consolidate and compile received client data to a set
-    // socket.on('clientUser', addUser(data.userID));
+    socket.on('add user', function addUser(info) {
+      var googleUser = info.googleUser;
+      var publicUserID = info.googleUserID;
+      var email = info.gmail;
+      var studySpace = info.studySpace;
+      var posting = info.posting;
+
+      if(spaceDict[studySpace] === null || spaceDict[studySpace] === undefined){
+        spaceDict[studySpace] = [[publicUserID, posting]];
+      }else{
+        // if user already exists, remove it (so it can later be replaced)
+        if (publicUserID in spaceDict[studySpace]) {
+          spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
+        }
+        spaceDict[studySpace].push([publicUserID, posting]);
+      }
+      googleDict[publicUserID] = [googleUser, socket, email];
+    });
+
+
+    socket.on('remove user', function removeUser(info){
+      var googleUser = info.googleUser;
+      var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var studySpace = info.studySpace;
+      var posting = info.posting;
+
+      if(spaceDict[studySpace] != null && spaceDict[studySpace] != undefined) {
+        // remove the user in this space by publicUserID
+        var list = spaceDict[studySpace];
+        spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
+        delete googleDict.publicUserID;
+      }
+    });
+
+
+    socket.on('update posting', function updatePosting(info) {
+      var googleUser = info.googleUser;
+      var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var studySpace = info.studySpace;
+      var posting = info.posting;
+
+      if (spaceDict[studySpace] != null && spaceDict[studySpace] != undefined) {
+        var list = spaceDict[studySpace];
+        // remove the user in this space by publicUserID, then push updated posting
+        spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
+        spaceDict[studySpace].push([publicUserID, posting]);
+      }
+    });
+
+
+    socket.on('chosen space', function getPostingsList(data){
+      var space = data.studySpace;
+
+      setInterval(
+        function showSpaceStuff(){
+          socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space] })
+        }, 10000);
+    });
+
+
+    // "user" sent ping to "person"; "person" receives ping
+    socket.on('send ping', function receivePing(info){
+      var name = info.userName;
+      var userID = info.publicUserID;
+      var personID = info.publicPersonID;
+      googleDict[personID][1].emit('receive ping', {publicUserID: userID, requestorName: name});
+    });
+
+
+    //person (called user below) accepts ping
+    //user (called person below) receives ack
+    socket.on('accept ping', function receiveAck(info){
+      var userID = info.publicUserID;
+      var personID = info.publicPersonID;
+      var email = googleDict[userID][2];
+
+      googleDict[personID][1].emit('receive ack', {publicUserID: userID, emailInfo: email});
+    });
+
 });
-
-
-/*
-      >>>EMIT REQUESTS<<<
-*/
-//aggregates and sends the list of all users found in open clients
-function sendUsers() {
-  //need to modify
-    io.emit('users', {users: getUsers()} );
-}
-
-//send to the client the list of users of each user every 10 seconds
-setInterval(sendUsers, 10000);
-
-
-/*
-      >>>SERVER HELPER FUNCTIONS<<<
-*/
-function addUser(user) {
-    usersSet.add(user);
-}
-
-//TODO:
-//need to figure out a way to get users removed
-//should this happen in client or in server?
-//as in... should the server detect a timeout and then remove a user (that's a lot of things to keep track of!)
-//or... should the client tell the server when a user has left? (can this be done automatically on exit of a frame?)
-function removeUser(user){
-
-}
-
-//getUsers will only be correct for the index... since we haven't implemented the other chat-channels based on school locations yet
-function getUsers(){
-  return usersSet.toString();
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //webpage has a function "listen" that listens to localhost:3000
 webpage.listen(process.env.PORT || 5000);

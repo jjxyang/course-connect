@@ -17,7 +17,7 @@
     "url": "https://github.com/jjxyang/course-connect/issues"
   },
   "engines": {
-    "node": "8.8.1"
+    "node": "4.1.1"
   },
   "homepage": "https://github.com/jjxyang/course-connect#readme",
   "dependencies": {
