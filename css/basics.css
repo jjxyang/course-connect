@@ -106,7 +106,16 @@ ul {
 
 .spaceButton {
   margin-bottom: 10px;
-  font-size: 120%;
+  font-size: 150%;
+}
+
+.connectLog {
+  min-height: 100%;
+  height: 100%;
+  margin: 0;
+  overflow-y: auto;
+  border-left: 1px;
+  border-left-style: solid;
 }
 
 
