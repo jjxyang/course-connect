@@ -201,7 +201,7 @@ $(document).ready(function() {
     console.log("requesting connection with", otherUserName);
     var name = gUser.getBasicProfile().getName();
     socket.emit('send ping', {userName: name, publicUserID: gUserID, publicPersonID: otherUserID});
-    alert("You sent a ping to " + otherUserName + "!");
+    addToLog("You sent a ping to " + otherUserName + "!");
   }
 
   // SOMEONE wants to connect to this USER
@@ -210,12 +210,12 @@ $(document).ready(function() {
     var otherID = info.publicPersonID;
     var otherName = info.requestorName;
     var name = gUser.getBasicProfile().getName();
-    console.log("received ping from", otherName);
+    addToLog(otherName + " wants to meet up with you!");
 
     // unbind listeners first
     $('#acceptPing').off('click');
     $('#ignorePing').off('click');
-    
+
     // functions for USER to accept or ignore ping from OTHER;
     $('#acceptPing').on('click', function (e) {
       socket.emit('accept ping', {userName: name, publicUserID: gUserID, publicPersonID: otherID});
@@ -233,9 +233,7 @@ $(document).ready(function() {
   socket.on('receive ack', function receiveAck(info){
     var otherName = info.personName;
     var otherEmail = info.emailInfo;
-
-    // TODO: what's a "longer-lasting" solution?
-    alert(otherName + " wants to meet with you, too! Their email is: " + otherEmail);
+    addToLog(otherName + " wants to meet with you, too! Their email is: " + otherEmail);
   });
 
   //function call to editPost
@@ -243,6 +241,12 @@ $(document).ready(function() {
   function editPost(){
     post();
     socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  }
+
+  function addToLog(message) {
+    $('#messages').append(
+      '<li class="list-group-item">' + message + '</li>'
+    );
   }
 
 }); // closure
