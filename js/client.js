@@ -200,17 +200,18 @@ $(document).ready(function() {
   function requestConnection(otherUserID, otherUserName) {
     console.log("requesting connection with", otherUserName);
     var name = gUser.getBasicProfile().getName();
-    socket.emit('send ping', {userName: name, publicUserID: gUserID, publicPersonID: otherUserID});
+    socket.emit('send ping', {requestorID: gUserID, requestorName: name, wantedID: otherUserID});
     addToLog("You sent a ping to " + otherUserName + "!");
   }
 
   // SOMEONE wants to connect to this USER
   // receive a ping that someone sent you. You can either ACCEPT or REJECT
   socket.on('receive ping', function receivePing(info){
-    var otherID = info.publicPersonID;
-    var otherName = info.requestorName;
+    var requestorID = info.requestorID;
+    var requestorName = info.requestorName;
+
     var name = gUser.getBasicProfile().getName();
-    addToLog(otherName + " wants to meet up with you!");
+    addToLog(requestorName + " wants to meet up with you!");
 
     // unbind listeners first
     $('#acceptPing').off('click');
@@ -218,7 +219,7 @@ $(document).ready(function() {
 
     // functions for USER to accept or ignore ping from OTHER;
     $('#acceptPing').on('click', function (e) {
-      socket.emit('accept ping', {userName: name, publicUserID: gUserID, publicPersonID: otherID});
+      socket.emit('accept ping', {wantedName: name, wantedID: gUserID, requestorID: requestorID});
       $('#receivePing').css("display", "none");
     });
     $('#ignorePing').on('click', function (e) {
@@ -226,14 +227,18 @@ $(document).ready(function() {
     });
 
     // display the ping
-    $('#receivePingText').text(otherName + " wants to meet up with you!");
+    $('#receivePingText').text(requestorName + " wants to meet up with you!");
     $('#receivePing').css("display", "block");
   });
 
+
+
+
   socket.on('receive ack', function receiveAck(info){
-    var otherName = info.personName;
-    var otherEmail = info.emailInfo;
-    addToLog(otherName + " wants to meet with you, too! Their email is: " + otherEmail);
+    var wantedName = info.wantedName;
+    var wantedEmail = info.wantedEmail;
+
+    addToLog(wantedName + " wants to meet with you, too! Their email is: " + wantedEmail);
   });
 
   //function call to editPost
