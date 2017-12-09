@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="579097782251-5gu8lp3m2act1277smb5u1j29hiu38ri.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <title>Course Connect</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Custom stylesheets -->
+    <link href="css/basics.css" rel="stylesheet">
+</head>
+
+<body>
+  <ul class="pages">
+    <li class="connect page">
+      <div class="container studySpaceArea">
+        <h3 id="studySpaceName" class="title">Cory Hall</h3>
+        <div class="col-sm-9" id="postings"></div>
+        <div class="col-sm-3 connectLog">
+          <ul class="list-group" id="messages">
+            <h4>Message Log</h4>
+            <li class="list-group-item">Welcome to Course Connect!</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="popup" id="receivePing">
+        <p id="receivePingText">Placeholder</p>
+        <a id="acceptPing" href="#">Let's meet up!</a>
+        <a id="ignorePing" href="#">Ignore</a>
+      </div>
+    </li>
+
+
+    <li class="join page">
+      <h3 class="title">Join a study space on the right to find classmates!</h3>
+      <div/>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label class="label" for="topic">Topic:</label>
+          <input id="topic" name="topic" class="input form-control" type="text" placeholder="Which class or topic?"/>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="category">Category:</label>
+          <select id="category" name="category" class="input form-control" >
+            <option>Homework</option>
+            <option>Project</option>
+            <option>Debugging</option>
+            <option>Concepts</option>
+            <option>Advice</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <form id="statusChoice" class="form-group">
+          <label class="label" for="status">Status:</label>
+          <label class="label col-sm-4 radio-inline">
+            <input name="status" type="radio" value="looking for help" checked>Looking for help
+          </label>
+          <label class="label col-sm-4 radio-inline">
+            <input name="status" type="radio" value="offering help">Offering help
+          </label>
+        </form>
+      </div>
+
+      <div class="col-sm-6">
+        <div class="spaceButton"><button id="coryHall" class="btn btn-primary">Cory Hall</button></div>
+        <div class="spaceButton"><button id="sodaHall" class="btn btn-primary">Soda Hall</button></div>
+        <div class="spaceButton"><button id="mlk" class="btn btn-primary">MLK Student Union</button></div>
+        <div class="spaceButton"><button id="moffittLibrary" class="btn btn-primary">Moffitt Library</button></div>
+        <div class="spaceButton"><button id="doeLibrary" class="btn btn-primary">Doe Library</button></div>
+      </div>
+    </li>
+
+
+    <li class="login page">
+      <h3 class="title">Welcome to Course Connect!</h3>
+      <h3 class="title">Find where your classmates are and study with them!</h3>
+      <h3 class="title">Please log into Google with your Berkeley email, then click Enter below!</h3>
+      <button class="btn btn-primary" id="enter">Enter</button>
+
+      <!-- Google OAuth -->
+      <div class="col-md-12 text-center">
+        <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+      </div>
+    </li>
+  </ul>
+
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <!-- <script type='text/javascript' src='/js/config.js'></script> -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/client.js"></script>
+</body>
+
+</html>
