@@ -108,13 +108,16 @@ ul {
   height: 100%;
   margin: 0;
   overflow-y: auto;
-  border-left: 1px;
-  border-left-style: solid;
+  border: 1px;
+  border-style: solid;
+  border-color: gray;
+  border-radius: 5px;
+  font-size: 100%;
 }
 
 .studySpaceArea {
   height: 100%;
-  padding-bottom: 60px;
+  font-size: 120%;
 }
 
 #studySpaceName {
