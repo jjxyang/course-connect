@@ -216,10 +216,11 @@ io.on('connection', function(socket) {
 
     // "user" sent ping to "person"; "person" receives ping
     socket.on('send ping', function receivePing(info){
-      var name = info.userName;
-      var userID = info.publicUserID;
-      var personID = info.publicPersonID;
-      googleDict[personID][1].emit('receive ping', {publicUserID: userID, publicPersonID: personID, requestorName: name});
+      var requestorID = info.requestorID; //person who sent the ping
+      var requestorName = info.requestorName; //name of the person who sent the ping
+      var wantedID = info.wantedID; //person to receive ping
+
+      googleDict[wantedID][1].emit('receive ping', {requestorID: requestorID, requestorName: requestorName});
     });
 
 
@@ -227,13 +228,13 @@ io.on('connection', function(socket) {
     // OTHER accepted ping
     // THIS USER (who initiated the ping) will receive ack
     socket.on('accept ping', function receiveAck(info){
-      var otherID = info.publicUserID;
-      var thisID = info.publicPersonID;
-      var otherName = info.userName;
-      var email = googleDict[otherID][2];
-      // console.log(otherID + " is accepting ping for", thisID);
+      var wantedName = info.wantedName;
+      var requestorID = info.requestorID;
 
-      googleDict[thisID][1].emit('receive ack', {personName: otherName, emailInfo: email});
+      var wantedID = info.wantedID;
+      var wantedEmail = googleDict[wantedID][2];
+
+      googleDict[requestorID][1].emit('receive ack', {wantedName: wantedName, wantedEmail: wantedEmail});
     });
 
 });
