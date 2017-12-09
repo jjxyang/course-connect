@@ -225,19 +225,20 @@ io.on('connection', function(socket) {
 
 
     // TODO: verify that the first round of pinging/accepting actually happened?
-    // OTHER accepted ping
-    // THIS USER (who initiated the ping) will receive ack
+    // WANTED accepted ping, BOTH users will receive ack
     socket.on('accept ping', function receiveAck(info){
       var wantedName = info.wantedName;
-      var requestorID = info.requestorID;
-
+      var requestorName = info.requestorName;
       var wantedID = info.wantedID;
+      var requestorID = info.requestorID;
       var wantedEmail = googleDict[wantedID][2];
+      var requestorEmail = googleDict[requestorID][2];
 
-      googleDict[requestorID][1].emit('receive ack', {wantedName: wantedName, wantedEmail: wantedEmail});
+      // send acks to both users
+      googleDict[requestorID][1].emit('receive ack', {name: wantedName, email: wantedEmail});
+      googleDict[wantedID][1].emit('receive ack', {name: requestorName, email: requestorEmail});
     });
-
-});
+}); // end "connection"
 
 //webpage has a function "listen" that listens to localhost:3000
 webpage.listen(process.env.PORT || 3000);

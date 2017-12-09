@@ -219,14 +219,19 @@ $(document).ready(function() {
 
     // functions for USER to accept or ignore ping from OTHER;
     $('#acceptPing').on('click', function (e) {
-      socket.emit('accept ping', {wantedName: name, wantedID: gUserID, requestorID: requestorID});
+      socket.emit('accept ping', {
+        wantedName: name,
+        requestorName: requestorName,
+        wantedID: gUserID,
+        requestorID: requestorID
+      });
       $('#receivePing').css("display", "none");
     });
     $('#ignorePing').on('click', function (e) {
       $('#receivePing').css("display", "none");
     });
 
-    // display the ping
+    // display the ping via popup
     $('#receivePingText').text(requestorName + " wants to meet up with you!");
     $('#receivePing').css("display", "block");
   });
@@ -235,10 +240,10 @@ $(document).ready(function() {
 
 
   socket.on('receive ack', function receiveAck(info){
-    var wantedName = info.wantedName;
-    var wantedEmail = info.wantedEmail;
+    var name = info.name;
+    var email = info.email;
 
-    addToLog(wantedName + " wants to meet with you, too! Their email is: " + wantedEmail);
+    addToLog("Great, " + name + " wants to meet with you! Their email is: " + email);
   });
 
   //function call to editPost
