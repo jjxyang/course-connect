@@ -124,6 +124,10 @@ ul {
   padding-left: 15px;
 }
 
+#postings {
+  overflow-y: auto;
+}
+
 /* Popup formatting */
 .popup {
   display: none;
