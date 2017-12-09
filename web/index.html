@@ -19,23 +19,61 @@
 <body>
   <ul class="pages">
     <li class="connect page">
-      <div class="studySpaceArea">
-        <h3 class="title">Cory Hall</h3>
-        <!-- <ul class="messages"></ul> -->
+      <div class="container studySpaceArea">
+        <h3 id="studySpaceName" class="title">Cory Hall</h3>
+        <div class="col-sm" id="postings">
+        </div>
       </div>
-      <!-- <input class="inputMessage" placeholder="Type here..."/> -->
     </li>
 
+
     <li class="join page">
-      <h3 class="title">Join a study space to find classmates!</h3>
-      <button id="coryHall" class="btn btn-primary">Cory Hall</button>
+      <h3 class="title">Join a study space on the right to find classmates!</h3>
+      <div/>
+      <div class="col-sm-6">
+        <div class="form-group">
+          <label class="label" for="topic">Topic:</label>
+          <input id="topic" name="topic" class="input form-control" type="text" placeholder="Which class or topic?"/>
+        </div>
+
+        <div class="form-group">
+          <label class="label" for="category">Category:</label>
+          <select id="category" name="category" class="input form-control" >
+            <option>Homework</option>
+            <option>Project</option>
+            <option>Debugging</option>
+            <option>Concepts</option>
+            <option>Advice</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <form id="statusChoice" class="form-group">
+          <label class="label" for="status">Status:</label>
+          <label class="label col-sm-4 radio-inline">
+            <input name="status" type="radio" value="looking for help" checked>Looking for help
+          </label>
+          <label class="label col-sm-4 radio-inline">
+            <input name="status" type="radio" value="offering help">Offering help
+          </label>
+        </form>
+      </div>
+
+      <div class="col-sm-6">
+        <div class="spaceButton"><button id="coryHall" class="btn btn-primary">Cory Hall</button></div>
+        <div class="spaceButton"><button id="sodaHall" class="btn btn-primary">Soda Hall</button></div>
+        <div class="spaceButton"><button id="mlk" class="btn btn-primary">MLK Student Union</button></div>
+        <div class="spaceButton"><button id="moffittLibrary" class="btn btn-primary">Moffitt Library</button></div>
+        <div class="spaceButton"><button id="doeLibrary" class="btn btn-primary">Doe Library</button></div>
+      </div>
     </li>
+
 
     <li class="login page">
       <h3 class="title">Welcome to Course Connect!</h3>
       <h3 class="title">Find where your classmates are and study with them!</h3>
-      <h3 class="title">Please log in...</h3>
-      <button class="btn btn-primary" id="tempSignIn">Temp Sign-in</button>
+      <h3 class="title">Please log into Google with your Berkeley email, then click Enter below!</h3>
+      <button class="btn btn-primary" id="enter">Enter</button>
 
       <!-- Google OAuth -->
       <div class="col-md-12 text-center">
