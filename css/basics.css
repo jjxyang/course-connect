@@ -1,11 +1,3 @@
-.page-content-wrapper {
-  width: 100%;
-  position: fixed;
-  padding: 15px;
-  padding-top: 70px;
-}
-
-
 /* Fix user-agent */
 * {
   box-sizing: border-box;
@@ -39,7 +31,6 @@ ul {
 }
 
 /* Pages */
-
 .pages {
   height: 100%;
   margin: 0;
@@ -53,6 +44,7 @@ ul {
   width: 100%;
 }
 
+
 /* Login Page */
 .login.page {
   position: absolute;
@@ -65,6 +57,7 @@ ul {
   color: #fff;
   font-size: 200%;
 }
+
 
 /* Join Page */
 .join.page {
@@ -99,14 +92,15 @@ ul {
   margin: auto
 }
 
-/* Connect page */
-.connect.page {
-  display: none;
-}
-
 .spaceButton {
   margin-bottom: 10px;
   font-size: 150%;
+}
+
+
+/* Connect page */
+.connect.page {
+  display: none;
 }
 
 .connectLog {
@@ -118,6 +112,14 @@ ul {
   border-left-style: solid;
 }
 
+.studySpaceArea {
+  height: 100%;
+  padding-bottom: 60px;
+}
+
+#studySpaceName {
+  padding-left: 15px;
+}
 
 /* Popup formatting */
 .popup {
@@ -154,58 +156,4 @@ ul {
   right: 0;
   background: rgba(0,0,0,0.5);
   z-index: -2;
-}
-
-
-/* Font */
-.messages {
-  font-size: 150%;
-}
-
-.inputMessage {
-  font-size: 100%;
-}
-
-.log {
-  color: gray;
-  font-size: 70%;
-  margin: 5px;
-  text-align: center;
-}
-
-/* Messages */
-.studySpaceArea {
-  height: 100%;
-  padding-bottom: 60px;
-}
-
-.messages {
-  height: 100%;
-  margin: 0;
-  overflow-y: scroll;
-  padding: 10px 20px 10px 20px;
-}
-
-.message.typing .messageBody {
-  color: gray;
-}
-
-.username {
-  font-weight: 700;
-  overflow: hidden;
-  padding-right: 15px;
-  text-align: right;
-}
-
-/* Input */
-.inputMessage {
-  border: 10px solid #000;
-  bottom: 0;
-  height: 60px;
-  left: 0;
-  outline: none;
-  padding-left: 10px;
-  position: absolute;
-  right: 0;
-  width: 100%;
 }
