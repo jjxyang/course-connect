@@ -74,7 +74,6 @@ $(document).ready(function() {
     var posting = post();
     if (posting !== undefined && posting !== null) {
       var data = {
-        googleUser: gUser,
         googleUserID: gUserID,
         gmail: email,
         studySpace: chosenSpace,
@@ -192,7 +191,7 @@ $(document).ready(function() {
 
   //should emit the event 'remove user' to server
   window.addEventListener("beforeunload", function (e) {
-    socket.emit('remove user', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
     return;
   });
 

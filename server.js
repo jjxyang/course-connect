@@ -105,7 +105,7 @@ function server(request, response) {
       >>>VARIABLES<<<
 */
 var webpage = http.createServer(server);
-var googleDict = {}; //keeps track of all online users and their connection sockets {userID: [googleUser, socketID]}
+var googleDict = {}; //keeps track of all online users and their connection sockets {userID: [socketID, email]}
 //stores only publicID info for all users and their corresponding posts
 var spaceDict = {
   'Cory Hall': null,
@@ -155,7 +155,6 @@ io.on('connection', function(socket) {
     //listen for the userID data
     //consolidate and compile received client data to a set
     socket.on('add user', function addUser(info) {
-      var googleUser = info.googleUser;
       var publicUserID = info.googleUserID;
       var email = info.gmail;
       var studySpace = info.studySpace;
@@ -170,12 +169,11 @@ io.on('connection', function(socket) {
         }
         spaceDict[studySpace].push([publicUserID, posting]);
       }
-      googleDict[publicUserID] = [googleUser, socket, email];
+      googleDict[publicUserID] = [socket, email];
     });
 
 
     socket.on('remove user', function removeUser(info){
-      var googleUser = info.googleUser;
       var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
       var studySpace = info.studySpace;
       var posting = info.posting;
@@ -220,7 +218,7 @@ io.on('connection', function(socket) {
       var requestorName = info.requestorName; //name of the person who sent the ping
       var wantedID = info.wantedID; //person to receive ping
 
-      googleDict[wantedID][1].emit('receive ping', {requestorID: requestorID, requestorName: requestorName});
+      googleDict[wantedID][0].emit('receive ping', {requestorID: requestorID, requestorName: requestorName});
     });
 
 
@@ -231,12 +229,12 @@ io.on('connection', function(socket) {
       var requestorName = info.requestorName;
       var wantedID = info.wantedID;
       var requestorID = info.requestorID;
-      var wantedEmail = googleDict[wantedID][2];
-      var requestorEmail = googleDict[requestorID][2];
+      var wantedEmail = googleDict[wantedID][1];
+      var requestorEmail = googleDict[requestorID][1];
 
       // send acks to both users
-      googleDict[requestorID][1].emit('receive ack', {name: wantedName, email: wantedEmail});
-      googleDict[wantedID][1].emit('receive ack', {name: requestorName, email: requestorEmail});
+      googleDict[requestorID][0].emit('receive ack', {name: wantedName, email: wantedEmail});
+      googleDict[wantedID][0].emit('receive ack', {name: requestorName, email: requestorEmail});
     });
 }); // end "connection"
 
