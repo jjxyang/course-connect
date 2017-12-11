@@ -183,6 +183,7 @@ $(document).ready(function() {
       var condition = info.condition;
       if(condition == true){
         alert("You've logged in already.");
+        console.log("number of times")
       } else {
         // If the email is valid, fade out page
         if (email.indexOf("@berkeley.edu") !== -1) {
@@ -190,6 +191,7 @@ $(document).ready(function() {
           $loginPage.fadeOut();
           $joinPage.show();
           $loginPage.off('click');
+          socket.emit('active user', {googleUserID: gUserID});
         } else {
           alert("Sorry, you're not a Berkeley student!");
         }
