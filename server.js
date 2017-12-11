@@ -152,6 +152,16 @@ io.on('connection', function(socket) {
         socket.emit('spaces', {dictionary: getNumPeople()} );
     }, 1000);
 
+
+    socket.on('check duplicate', function check(info){
+      guid = info.googleUserID;
+      if(guid in googleDict){
+        socket.emit('duplicate user', {condition: true});
+    } else {
+        socket.emit('duplicate user', {condition: false});
+    }
+  });
+
     //listen for the userID data
     //consolidate and compile received client data to a set
     socket.on('add user', function addUser(info) {
@@ -162,6 +172,7 @@ io.on('connection', function(socket) {
 
       if(spaceDict[studySpace] === null || spaceDict[studySpace] === undefined){
         spaceDict[studySpace] = [[publicUserID, posting]];
+        googleDict[publicUserID] = [socket, email];
       }else{
         // if user already exists, remove it (so it can later be replaced)
         if (publicUserID in spaceDict[studySpace]) {
@@ -169,7 +180,7 @@ io.on('connection', function(socket) {
         }
         spaceDict[studySpace].push([publicUserID, posting]);
       }
-      googleDict[publicUserID] = [socket, email];
+      // googleDict[publicUserID] = [socket, email];
     });
 
 
