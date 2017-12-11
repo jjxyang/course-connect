@@ -8,7 +8,7 @@ $(document).ready(function() {
   var $connectPage = $('.connect.page'); // the connect page
 
   var spaceDictionary = {};
-  var gUser;
+  var gUserProfile;
   var gUserID;
   var email;
   var chosenSpace;
@@ -24,19 +24,16 @@ $(document).ready(function() {
 
   // google auth signin
   window.onSignIn = function (googleUser) {
-    // save off the googleUser
-    // TODO: is this secure?
-    gUser = googleUser;
+    // save off user's google profile and id
     // TODO: deal with auth/security concerns re: google id's
     // https://developers.google.com/identity/sign-in/web/people
     // https://developers.google.com/identity/sign-in/web/backend-auth
-    gUserID = gUser.getBasicProfile().getId();
+    gUserProfile = googleUser.getBasicProfile();
+    gUserID = gUserProfile.getId();
 
-    var profile = googleUser.getBasicProfile();
-    var email = profile.getEmail();
-    console.log('Full Name: ' + profile.getName());
-    console.log('Given Name: ' + profile.getGivenName());
-    console.log("Email: " + profile.getEmail());
+    console.log('Full Name: ' + gUserProfile.getName());
+    console.log('Given Name: ' + gUserProfile.getGivenName());
+    console.log("Email: " + gUserProfile.getEmail());
     console.log("signed in!");
   };
 
@@ -91,7 +88,7 @@ $(document).ready(function() {
   // Useful for both createPost and editPost actions.
   // Whenever a user wants to edit a post, it is safe to reuse this function
   function post() {
-    var name = gUser.getBasicProfile().getGivenName();
+    var name = gUserProfile.getGivenName();
     var topic = $('#topic').val();
     var category = $('#category').val();
     var status = $('input[name=status]:checked', '#statusChoice').val();
@@ -119,18 +116,19 @@ $(document).ready(function() {
 
   // Sets the client's google profile
   function setProfile () {
-    email = gUser.getBasicProfile().getEmail();
     console.log("setting profile");
+    email = gUserProfile.getEmail();
     condition = email.indexOf("@berkeley.edu") !== -1
 
     // If the email is valid, fade out page
     if (true) {
-      console.log("yay you're a berkeley student")
+      console.log("user is a berkeley student");
       $loginPage.fadeOut();
       $joinPage.show();
       $loginPage.off('click');
-    } else {u
+    } else {
       alert("Sorry, you're not a Berkeley student!");
+      console.log("user is not a berkeley student");
     }
   }
 
@@ -199,7 +197,7 @@ $(document).ready(function() {
   // THIS USER wants to connect to SOMEONE ELSE
   function requestConnection(otherUserID, otherUserName) {
     console.log("requesting connection with", otherUserName);
-    var name = gUser.getBasicProfile().getName();
+    var name = gUserProfile.getName();
     socket.emit('send ping', {requestorID: gUserID, requestorName: name, wantedID: otherUserID});
     addToLog("You sent a ping to " + otherUserName + "!");
   }
@@ -210,7 +208,7 @@ $(document).ready(function() {
     var requestorID = info.requestorID;
     var requestorName = info.requestorName;
 
-    var name = gUser.getBasicProfile().getName();
+    var name = gUserProfile.getName();
     addToLog(requestorName + " wants to meet up with you!");
 
     // unbind listeners first
@@ -236,9 +234,6 @@ $(document).ready(function() {
     $('#receivePing').css("display", "block");
   });
 
-
-
-
   socket.on('receive ack', function receiveAck(info){
     var name = info.name;
     var email = info.email;
@@ -250,7 +245,7 @@ $(document).ready(function() {
   // TODO: finish implementation
   function editPost(){
     post();
-    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    socket.emit('update posting', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
   }
 
   function addToLog(message) {
