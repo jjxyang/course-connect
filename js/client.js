@@ -17,6 +17,7 @@ $(document).ready(function() {
 
   var socket = io();
 
+  // ------------------------ LOGIN PAGE ------------------------
   // temp signin button
   $('#enter').on('click', function (e) {
     setProfile();
@@ -37,6 +38,8 @@ $(document).ready(function() {
     console.log("signed in!");
   };
 
+
+  // ------------------------ JOIN PAGE -------------------------
   // takes user to the chosen space
   $('#coryHall').on('click', function (e) {
     chosenSpace = 'Cory Hall';
@@ -57,6 +60,12 @@ $(document).ready(function() {
   $('#doeLibrary').on('click', function (e) {
     chosenSpace = 'Doe Library';
     showStudySpace(chosenSpace);
+  });
+
+
+  // ------------------------ CONNECT PAGE ----------------------
+  $('#editPosting').on('click', function (e) {
+    goToEditPosting();
   });
 
 
@@ -241,11 +250,13 @@ $(document).ready(function() {
     addToLog("Great, " + name + " wants to meet with you! Their email is: " + email);
   });
 
-  //function call to editPost
-  // TODO: finish implementation
-  function editPost(){
-    post();
-    socket.emit('update posting', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  // function call to editPost
+  function goToEditPosting() {
+    console.log("going back to edit posting, removing user's current posting");
+    $connectPage.fadeOut();
+    $joinPage.show();
+    $connectPage.off('click');
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
   }
 
   function addToLog(message) {
