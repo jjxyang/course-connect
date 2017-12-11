@@ -182,7 +182,7 @@ io.on('connection', function(socket) {
         // remove the user in this space by publicUserID
         var list = spaceDict[studySpace];
         spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
-        delete googleDict.publicUserID;
+        delete googleDict[publicUserID];
       }
     });
 
@@ -233,8 +233,8 @@ io.on('connection', function(socket) {
       var requestorEmail = googleDict[requestorID][1];
 
       // send acks to both users
-      googleDict[requestorID][0].emit('receive ack', {name: wantedName, email: wantedEmail});
-      googleDict[wantedID][0].emit('receive ack', {name: requestorName, email: requestorEmail});
+      googleDict[requestorID][0].emit('receive ack', {name: wantedName, email: wantedEmail, id: wantedID});
+      googleDict[wantedID][0].emit('receive ack', {name: requestorName, email: requestorEmail, id: requestorID});
     });
 }); // end "connection"
 
