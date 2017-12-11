@@ -121,14 +121,15 @@ $(document).ready(function() {
   function setProfile () {
     email = gUser.getBasicProfile().getEmail();
     console.log("setting profile");
+    condition = email.indexOf("@berkeley.edu") !== -1
 
     // If the email is valid, fade out page
-    if (email.indexOf("@berkeley.edu") !== -1) {
+    if (true) {
       console.log("yay you're a berkeley student")
       $loginPage.fadeOut();
       $joinPage.show();
       $loginPage.off('click');
-    } else {
+    } else {u
       alert("Sorry, you're not a Berkeley student!");
     }
   }
@@ -170,7 +171,7 @@ $(document).ready(function() {
               posting.topic +
             '</li>' +
           '</ul>' +
-          '<div class="panel-body">' +
+          '<div class="panel-body" id="' + posting.name + '">' +
             '<button class="btn btn-info" id="' + userID + '">' +
               'Connect with ' + posting.name +
             '</button>' +
@@ -182,7 +183,7 @@ $(document).ready(function() {
       $('#postings').off('click', '#' + userID);
       // add new click listener to the 'connect' button of each div
       $('#postings').on('click', '#' + userID, function (e) {
-        requestConnection(userID, posting.name);
+        requestConnection($(this).attr("id"), $(this).parent().attr("id"));
       });
     }
   };
