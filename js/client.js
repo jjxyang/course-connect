@@ -18,7 +18,7 @@ $(document).ready(function() {
 
   // ------------------------ LOGIN PAGE ------------------------
   $('#enter').on('click', function (e) {
-    setProfile();
+    checkIfDuplicateUser();
   });
 
   // google auth signin
@@ -152,32 +152,35 @@ $(document).ready(function() {
   // ------------------------------------------------------------
 
 
-  // Sets the client's google profile
-  function setProfile () {
+  // Sets the client's google profile, works with "duplicate user" event
+  function checkIfDuplicateUser () {
     console.log("setting profile");
     email = gUserProfile.getEmail();
     socket.emit('check duplicate', {googleUserID: gUserID});
-
-    socket.on('duplicate user', function check(info){
-      var condition = info.condition;
-      if(condition == true){
-        alert("You've logged in already.");
-        console.log("number of times")
-      } else {
-        // If the email is valid, fade out page
-        if (email.indexOf("@berkeley.edu") !== -1) {
-          console.log("user is a berkeley student");
-          $loginPage.fadeOut();
-          $joinPage.show();
-          $loginPage.off('click');
-          socket.emit('active user', {googleUserID: gUserID});
-        } else {
-          alert("Sorry, you're not a Berkeley student!");
-          console.log("user is not a berkeley student");
-        }
-      }
-    });
   }
+
+  // sets user profile only if:
+  // (1) user hasn't logged in already, (2) user has berkeley email
+  function setProfile(info) {
+    console.log("receiving if user is a duplicate", info.condition);
+    if (info.condition) {
+      alert("You've logged in already.");
+      console.log("number of times")
+    } else {
+      // If the email is valid, fade out page
+      if (email.indexOf("@berkeley.edu") !== -1) {
+        console.log("user is a berkeley student");
+        $loginPage.fadeOut();
+        $joinPage.show();
+        $loginPage.off('click');
+        socket.emit('active user', {googleUserID: gUserID});
+      } else {
+        alert("Sorry, you're not a Berkeley student!");
+        console.log("user is not a berkeley student");
+      }
+    }
+  }
+  socket.on('duplicate user', setProfile);
 
   // Useful for both createPost and editPost actions.
   // Whenever a user wants to edit a post, it is safe to reuse this function

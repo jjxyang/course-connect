@@ -155,22 +155,24 @@ io.on('connection', function(socket) {
         socket.emit('spaces', {dictionary: getNumPeople()} );
     }, 1000);
 
-    socket.on('active user', function addActive(info){
+    socket.on('active user', function addActive(info) {
+      console.log("adding active user", info.googleUserID);
       var activeID = info.googleUserID;
       activeUsers.add(activeID);
     });
 
 
-    socket.on('check duplicate', function check(info){
+    socket.on('check duplicate', function check(info) {
       guid = info.googleUserID;
-      if(activeUsers.has(guid)){
+      console.log("activeUsers", activeUsers);
+      if (activeUsers.has(guid)) {
         console.log("duplicate is " + true);
         socket.emit('duplicate user', {condition: true});
-    } else {
+      } else {
         console.log("duplicate is " + false);
         socket.emit('duplicate user', {condition: false});
-    }
-  });
+      }
+    });
 
     //listen for the userID data
     //consolidate and compile received client data to a set
