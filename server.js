@@ -26,10 +26,9 @@ function sendFileContent(response, fileName, contentType){
 
 //ensures that the webpage is one of several valid paths
 function verifyWebpage(param){
-  if(param === "/"
-    || param === "/index.html"
-    //|| param === "SCHOOL-LOCATIONS-HERE.HTML"
-    ){
+  if (param == "/"
+    || param == "/index.html"
+    || param == "/about.html") {
     return true;
   }
   return false;
@@ -105,8 +104,11 @@ function server(request, response) {
       >>>VARIABLES<<<
 */
 var webpage = http.createServer(server);
-var googleDict = {}; //keeps track of all online users and their connection sockets {userID: [googleUser, socketID]}
+//keeps track of all online users and their connection sockets {userID: [socketID, email]}
 //stores only publicID info for all users and their corresponding posts
+var googleDict = {};
+//stores active users regardless of whether they've entered a space or not
+var activeUsers = new Set();
 var spaceDict = {
   'Cory Hall': null,
   'Soda Hall': null,
@@ -114,6 +116,7 @@ var spaceDict = {
   'Moffitt Library': null,
   'Doe Library': null
 };
+var showSpaceInterval = null;
 
 /*
       >>>SERVER HELPER FUNCTIONS<<<
@@ -152,10 +155,26 @@ io.on('connection', function(socket) {
         socket.emit('spaces', {dictionary: getNumPeople()} );
     }, 1000);
 
+    socket.on('active user', function addActive(info){
+      var activeID = info.googleUserID;
+      activeUsers.add(activeID);
+    });
+
+
+    socket.on('check duplicate', function check(info){
+      guid = info.googleUserID;
+      if(activeUsers.has(guid)){
+        console.log("duplicate is " + true);
+        socket.emit('duplicate user', {condition: true});
+    } else {
+        console.log("duplicate is " + false);
+        socket.emit('duplicate user', {condition: false});
+    }
+  });
+
     //listen for the userID data
     //consolidate and compile received client data to a set
     socket.on('add user', function addUser(info) {
-      var googleUser = info.googleUser;
       var publicUserID = info.googleUserID;
       var email = info.gmail;
       var studySpace = info.studySpace;
@@ -163,20 +182,19 @@ io.on('connection', function(socket) {
 
       if(spaceDict[studySpace] === null || spaceDict[studySpace] === undefined){
         spaceDict[studySpace] = [[publicUserID, posting]];
-      }else{
+      } else {
         // if user already exists, remove it (so it can later be replaced)
         if (publicUserID in spaceDict[studySpace]) {
           spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
         }
         spaceDict[studySpace].push([publicUserID, posting]);
       }
-      googleDict[publicUserID] = [googleUser, socket, email];
+      googleDict[publicUserID] = [socket, email];
     });
 
 
     socket.on('remove user', function removeUser(info){
-      var googleUser = info.googleUser;
-      var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var publicUserID = info.googleUserID;
       var studySpace = info.studySpace;
       var posting = info.posting;
 
@@ -184,7 +202,17 @@ io.on('connection', function(socket) {
         // remove the user in this space by publicUserID
         var list = spaceDict[studySpace];
         spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
-        delete googleDict.publicUserID;
+        delete googleDict[publicUserID];
+      }
+
+      //added stuff to delete added things in activeUsers
+      if(activeUsers.has(publicUserID)){
+        activeUsers.delete(publicUserID);
+      }
+
+      // clear timed interval for 'show space stuff' socket emission
+      if (showSpaceInterval != null) {
+        clearInterval(showSpaceInterval);
       }
     });
 
@@ -207,36 +235,39 @@ io.on('connection', function(socket) {
     socket.on('chosen space', function getPostingsList(data){
       var space = data.studySpace;
 
-      setInterval(
-        function showSpaceStuff(){
-          socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space] })
-        }, 1000);
+      // save this interval so it can be canceled later
+      showSpaceInterval = setInterval(function showSpaceStuff() {
+        // console.log("showing space stuff for", space);
+        socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space]})
+      }, 1000);
     });
 
 
     // "user" sent ping to "person"; "person" receives ping
     socket.on('send ping', function receivePing(info){
-      var name = info.userName;
-      var userID = info.publicUserID;
-      var personID = info.publicPersonID;
-      googleDict[personID][1].emit('receive ping', {publicUserID: userID, publicPersonID: personID, requestorName: name});
+      var requestorID = info.requestorID; //person who sent the ping
+      var requestorName = info.requestorName; //name of the person who sent the ping
+      var wantedID = info.wantedID; //person to receive ping
+
+      googleDict[wantedID][0].emit('receive ping', {requestorID: requestorID, requestorName: requestorName});
     });
 
 
     // TODO: verify that the first round of pinging/accepting actually happened?
-    // OTHER accepted ping
-    // THIS USER (who initiated the ping) will receive ack
+    // WANTED accepted ping, BOTH users will receive ack
     socket.on('accept ping', function receiveAck(info){
-      var otherID = info.publicUserID;
-      var thisID = info.publicPersonID;
-      var otherName = info.userName;
-      var email = googleDict[otherID][2];
-      // console.log(otherID + " is accepting ping for", thisID);
+      var wantedName = info.wantedName;
+      var requestorName = info.requestorName;
+      var wantedID = info.wantedID;
+      var requestorID = info.requestorID;
+      var wantedEmail = googleDict[wantedID][1];
+      var requestorEmail = googleDict[requestorID][1];
 
-      googleDict[thisID][1].emit('receive ack', {personName: otherName, emailInfo: email});
+      // send acks to both users
+      googleDict[requestorID][0].emit('receive ack', {name: wantedName, email: wantedEmail, id: wantedID});
+      googleDict[wantedID][0].emit('receive ack', {name: requestorName, email: requestorEmail, id: requestorID});
     });
-
-});
+}); // end "connection"
 
 //webpage has a function "listen" that listens to localhost:3000
 webpage.listen(process.env.PORT || 3000);

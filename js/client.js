@@ -1,45 +1,44 @@
 $(document).ready(function() {
-  var FADE_TIME = 150; // ms
-
-  // Initialize variables
+  var socket = io();
   var $window = $(window);
-  var $loginPage = $('.login.page'); // the login page
-  var $joinPage = $('.join.page'); // the join page
+  var $loginPage = $('.login.page');     // the login page
+  var $joinPage = $('.join.page');       // the join page
   var $connectPage = $('.connect.page'); // the connect page
 
-  var spaceDictionary = {};
-  var gUser;
-  var gUserID;
-  var email;
-  var chosenSpace;
-  var userPosting = null;
+  var spamDictionary = {};
+  var connectedDictionary = {};         // dict of who user has connected to
+  var spaceDictionary = {};             // list of spaces and members in it
+  var gUserProfile;                     // google user profile
+  var gUserID;                          // google user ID
+  var email;                            // user's email
+  var chosenSpace;                      // user's current space
+  var userPosting = null;               // user's posting with topic, category, status
   var connected = false;
 
-  var socket = io();
 
-  // temp signin button
+  // ------------------------ LOGIN PAGE ------------------------
   $('#enter').on('click', function (e) {
     setProfile();
   });
 
   // google auth signin
   window.onSignIn = function (googleUser) {
-    // save off the googleUser
-    // TODO: is this secure?
-    gUser = googleUser;
+    // save off user's google profile and id
     // TODO: deal with auth/security concerns re: google id's
     // https://developers.google.com/identity/sign-in/web/people
     // https://developers.google.com/identity/sign-in/web/backend-auth
-    gUserID = gUser.getBasicProfile().getId();
+    gUserProfile = googleUser.getBasicProfile();
+    gUserID = gUserProfile.getId();
 
-    var profile = googleUser.getBasicProfile();
-    var email = profile.getEmail();
-    console.log('Full Name: ' + profile.getName());
-    console.log('Given Name: ' + profile.getGivenName());
-    console.log("Email: " + profile.getEmail());
+    console.log('Full Name: ' + gUserProfile.getName());
+    console.log('Given Name: ' + gUserProfile.getGivenName());
+    console.log("Email: " + gUserProfile.getEmail());
     console.log("signed in!");
   };
+  // ------------------------------------------------------------
 
+
+  // ------------------------ JOIN PAGE -------------------------
   // takes user to the chosen space
   $('#coryHall').on('click', function (e) {
     chosenSpace = 'Cory Hall';
@@ -61,6 +60,23 @@ $(document).ready(function() {
     chosenSpace = 'Doe Library';
     showStudySpace(chosenSpace);
   });
+  // ------------------------------------------------------------
+
+
+  // ------------------------ CONNECT PAGE ----------------------
+  $('#editPosting').on('click', function (e) {
+    goToEditPosting();
+  });
+
+  // function call to editPost
+  function goToEditPosting() {
+    console.log("going back to edit posting, removing user's current posting");
+    $connectPage.hide();
+    $connectPage.off('click');
+    $joinPage.fadeToggle();
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  }
+  // ------------------------------------------------------------
 
 
   // emits user's chosen space and posting to the server
@@ -74,7 +90,6 @@ $(document).ready(function() {
     var posting = post();
     if (posting !== undefined && posting !== null) {
       var data = {
-        googleUser: gUser,
         googleUserID: gUserID,
         gmail: email,
         studySpace: chosenSpace,
@@ -83,16 +98,91 @@ $(document).ready(function() {
       console.log("adding user");
       socket.emit("add user", data);
 
-      $joinPage.fadeOut();
+      $joinPage.fadeToggle();
       $connectPage.show();
       $joinPage.off('click');
     }
   }
 
+
+  /*
+     BUILT IN SPAM BLOCK
+     How it works:
+     if you choose to ignore someone's request, they're put in your spamDictionary
+     for 10 minutes. For the time being, you will not receive their notifications again,
+     UNLESS you REQUEST to connect with them, and they ACCEPT your request,
+     in which case they are removed from your spamDictionary and added into your
+     connectedDictionary, for 100 minutes (a time that is renewed every time you interact with them).
+  */
+  function addSpamDictionary(inputID){
+    if(inputID in connectedDictionary == false){
+      if(inputID in spamDictionary == false){
+        spamDictionary[inputID] = 60; //6 = 1 minute, 60 = 10 minutes
+      } // do nothing if inputID is already in spamDictionary... wait for the timeout from spamBlock()
+    } // don't do anything if inputID is in connectedDictionary
+  }
+
+  function addConnectedDictionary(inputID){
+    //every time you talk, the connection is renewed...
+    //removal happens only after being inactive for a certain period of time
+    connectedDictionary[inputID] = 600; //600 = 100 minutes
+  }
+
+  setInterval(function decrementDictionaries() {
+    for (var spamID in spamDictionary) {
+      spamDictionary[spamID] = spamDictionary[spamID] - 1;
+      console.log("spamDictionary: " + spamDictionary[spamID]);
+      if (spamDictionary[spamID] == 0 || spamDictionary == undefined) {
+        //remove the item from the dictionary
+        console.log("REACHED INSIDE FOR THE 0 CONDITION FOR SPAM");
+        delete spamDictionary[spamID];
+      }
+    }
+
+    for (var connectedID in connectedDictionary) {
+      connectedDictionary[connectedID] = connectedDictionary[connectedID] - 1;
+      console.log("connectedDictionary: " + connectedDictionary[connectedID]);
+      if (connectedDictionary[connectedID] == 0) {
+        //remove the item from the dictionary
+        console.log("REACHED INSIDE FOR THE 0 CONDITION FOR CONNECTED");
+        delete connectedDictionary[connectedID];
+      }
+    }
+  }, 10000);
+  // ------------------------------------------------------------
+
+
+  // Sets the client's google profile
+  function setProfile () {
+    console.log("setting profile");
+    email = gUserProfile.getEmail();
+    socket.emit('check duplicate', {googleUserID: gUserID});
+
+    socket.on('duplicate user', function check(info){
+      var condition = info.condition;
+      if(condition == true){
+        alert("You've logged in already.");
+        console.log("number of times")
+      } else {
+        // If the email is valid, fade out page
+        if (email.indexOf("@berkeley.edu") !== -1) {
+          console.log("user is a berkeley student");
+          $loginPage.fadeOut();
+          $joinPage.show();
+          $loginPage.off('click');
+          socket.emit('active user', {googleUserID: gUserID});
+        } else {
+          alert("Sorry, you're not a Berkeley student!");
+          console.log("user is not a berkeley student");
+        }
+      }
+    });
+  }
+
   // Useful for both createPost and editPost actions.
   // Whenever a user wants to edit a post, it is safe to reuse this function
   function post() {
-    var name = gUser.getBasicProfile().getGivenName();
+    var name = gUserProfile.getGivenName();
     var topic = $('#topic').val();
     var category = $('#category').val();
     var status = $('input[name=status]:checked', '#statusChoice').val();
@@ -116,27 +206,6 @@ $(document).ready(function() {
       userPosting = posting;
       return posting
     }
-  }
-
-  // Sets the client's google profile
-  function setProfile () {
-    email = gUser.getBasicProfile().getEmail();
-    console.log("setting profile");
-
-    // If the email is valid, fade out page
-    if (email.indexOf("@berkeley.edu") !== -1) {
-      console.log("yay you're a berkeley student")
-      $loginPage.fadeOut();
-      $joinPage.show();
-      $loginPage.off('click');
-    } else {
-      alert("Sorry, you're not a Berkeley student!");
-    }
-  }
-
-  // Prevents input from having injected markup
-  function cleanInput (input) {
-    return $('<div/>').text(input).html();
   }
 
 
@@ -171,7 +240,7 @@ $(document).ready(function() {
               posting.topic +
             '</li>' +
           '</ul>' +
-          '<div class="panel-body">' +
+          '<div class="panel-body" id="' + posting.name + '">' +
             '<button class="btn btn-info" id="' + userID + '">' +
               'Connect with ' + posting.name +
             '</button>' +
@@ -183,69 +252,102 @@ $(document).ready(function() {
       $('#postings').off('click', '#' + userID);
       // add new click listener to the 'connect' button of each div
       $('#postings').on('click', '#' + userID, function (e) {
-        requestConnection(userID, posting.name);
+        requestConnection($(this).attr("id"), $(this).parent().attr("id"));
       });
     }
   };
 
   socket.on('show space stuff', spaceStuff);
 
-  //should emit the event 'remove user' to server
+  // should emit the event 'remove user' to server when user leaves/refreshes page
   window.addEventListener("beforeunload", function (e) {
-    socket.emit('remove user', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
     return;
   });
 
+
+  // ------------------------ PING SYSTEM -----------------------
   // THIS USER wants to connect to SOMEONE ELSE
   function requestConnection(otherUserID, otherUserName) {
     console.log("requesting connection with", otherUserName);
-    var name = gUser.getBasicProfile().getName();
-    socket.emit('send ping', {userName: name, publicUserID: gUserID, publicPersonID: otherUserID});
+    var name = gUserProfile.getName();
+    socket.emit('send ping', {requestorID: gUserID, requestorName: name, wantedID: otherUserID});
     addToLog("You sent a ping to " + otherUserName + "!");
   }
 
   // SOMEONE wants to connect to this USER
   // receive a ping that someone sent you. You can either ACCEPT or REJECT
   socket.on('receive ping', function receivePing(info){
-    var otherID = info.publicPersonID;
-    var otherName = info.requestorName;
-    var name = gUser.getBasicProfile().getName();
-    addToLog(otherName + " wants to meet up with you!");
+    var requestorID = info.requestorID;
+    var requestorName = info.requestorName;
 
-    // unbind listeners first
-    $('#acceptPing').off('click');
-    $('#ignorePing').off('click');
+    if (requestorID in spamDictionary == false){
+      var name = gUserProfile.getName();
+      addToLog(requestorName + " wants to meet up with you! You can accept or ignore.");
 
-    // functions for USER to accept or ignore ping from OTHER;
-    $('#acceptPing').on('click', function (e) {
-      socket.emit('accept ping', {userName: name, publicUserID: gUserID, publicPersonID: otherID});
-      $('#receivePing').css("display", "none");
-    });
-    $('#ignorePing').on('click', function (e) {
-      $('#receivePing').css("display", "none");
-    });
+      // unbind listeners first
+      $('#acceptPing').off('click');
+      $('#ignorePing').off('click');
 
-    // display the ping
-    $('#receivePingText').text(otherName + " wants to meet up with you!");
-    $('#receivePing').css("display", "block");
+      // functions for USER to accept or ignore ping from OTHER;
+      $('#acceptPing').on('click', function (e) {
+        // some function in here to add to connectedDictionary... timeout = 100 minutes
+        addConnectedDictionary(requestorID);
+
+        socket.emit('accept ping', {
+          wantedName: name,
+          requestorName: requestorName,
+          wantedID: gUserID,
+          requestorID: requestorID
+        });
+        $('#receivePing').hide();
+      });
+      $('#ignorePing').on('click', function (e) {
+        // some function in here to add to spamDictionary... timeout = 1 minutes
+        addSpamDictionary(requestorID);
+
+        $('#receivePing').hide();
+      });
+
+      // display the ping via popup
+      $('#receivePingText').text(requestorName + " wants to meet up with you!");
+      $('#receivePing').show();
+  } // do nothing if requestorID is in spamDictionary
+
   });
 
   socket.on('receive ack', function receiveAck(info){
-    var otherName = info.personName;
-    var otherEmail = info.emailInfo;
-    addToLog(otherName + " wants to meet with you, too! Their email is: " + otherEmail);
-  });
+    var name = info.name;
+    var email = info.email;
+    var idInfo = info.id;
 
-  //function call to editPost
-  // TODO: finish implementation
-  function editPost(){
-    post();
-    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    if(spamDictionary[idInfo] !== null){
+      delete spamDictionary[idInfo];
+    }
+    addConnectedDictionary(idInfo);
+
+    addToLog("Great, " + name + " wants to meet with you! Their email is: " + email);
+  });
+  // ------------------------------------------------------------
+
+  
+  // Prevents input from having injected markup
+  function cleanInput (input) {
+    return $('<div/>').text(input).html();
   }
 
   function addToLog(message) {
+    // format a timestamp
+    var date = new Date();
+    var min = date.getMinutes().toString();
+    min = min.length < 2 ? ("0" + min) : min;
+    var sec = date.getSeconds().toString();
+    sec = sec.length < 2 ? ("0" + sec) : sec;
+    var timestamp = "[" + date.getHours() + ":" + min + ":" + sec + "] ";
+
+    // add new message elem to log
     $('#messages').append(
-      '<li class="list-group-item">' + message + '</li>'
+      '<li class="list-group-item">' + timestamp + message + '</li>'
     );
   }
 
