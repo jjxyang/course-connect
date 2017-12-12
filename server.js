@@ -201,7 +201,7 @@ io.on('connection', function(socket) {
       var posting = info.posting;
       var socketID = info.socketID;
 
-      if(googleDict[publicUserID][0] == socketID){
+      if(googleDict[publicUserID] !== null && googleDict[publicUserID][0] == socketID){
 
         if(spaceDict[studySpace] != null && spaceDict[studySpace] != undefined) {
           // remove the user in this space by publicUserID
