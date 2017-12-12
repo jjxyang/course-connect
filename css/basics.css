@@ -187,10 +187,10 @@ ul {
     border-radius: 3px;
 }
 
-.bs-callout-danger {
-    border-left-color: #d9534f;
+.bs-callout-info {
+    border-left-color: #5bc0de;
 }
 
-.bs-callout-danger h4 {
-    color: #d9534f;
+.bs-callout-info h4 {
+    color: #5bc0de;
 }
