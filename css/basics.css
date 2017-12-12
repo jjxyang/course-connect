@@ -53,9 +53,8 @@ ul {
 }
 
 .login.page .title {
-  margin-top: 100px;
+  margin: 20px;
   color: #fff;
-  font-size: 200%;
 }
 
 
@@ -67,9 +66,8 @@ ul {
 }
 
 .join.page .title {
-  margin-top: 100px;
+  margin: 20px;
   color: #fff;
-  font-size: 200%;
 }
 
 .join.page .label {
