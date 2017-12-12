@@ -6,7 +6,9 @@ $(document).ready(function() {
   var $loginPage = $('.login.page'); // the login page
   var $joinPage = $('.join.page'); // the join page
   var $connectPage = $('.connect.page'); // the connect page
-
+  
+  var spamDictionary = {};
+  var connectedDictionary = {};
   var spaceDictionary = {};
   var gUserProfile;
   var gUserID;
@@ -94,6 +96,57 @@ $(document).ready(function() {
     }
   }
 
+
+  /*
+     BUILT IN SPAM BLOCK
+     How it works:
+     if you choose to ignore someone's request, they're put in your spamDictionary
+     for 10 minutes. For the time being, you will not receive their notifications again,
+     UNLESS you REQUEST to connect with them, and they ACCEPT your request,
+     in which case they are removed from your spamDictionary and added into your
+     connectedDictionary, for 100 minutes (a time that is renewed every time you interact with them).
+  */
+  function addSpamDictionary(inputID){
+    if(inputID in connectedDictionary == false){
+      if(inputID in spamDictionary == false){
+        spamDictionary[inputID] = 60; //6 = 1 minute, 60 = 10 minutes
+      } // do nothing if inputID is already in spamDictionary... wait for the timeout from spamBlock()
+    } // don't do anything if inputID is in connectedDictionary
+  }
+
+  function addConnectedDictionary(inputID){
+    //every time you talk, the connection is renewed...
+    //removal happens only after being inactive for a certain period of time
+    connectedDictionary[inputID] = 600; //600 = 100 minutes
+  }
+
+  setInterval(
+    function decrementDictionaries() {
+    for (var spamID in spamDictionary){
+      spamDictionary[spamID] = spamDictionary[spamID] - 1;
+      console.log("spamDictionary: " + spamDictionary[spamID]);
+      if(spamDictionary[spamID] ==0 || spamDictionary == undefined){
+        //remove the item from the dictionary
+        console.log("REACHED INSIDE FOR THE 0 CONDITION FOR SPAM");
+        delete spamDictionary[spamID];
+      }
+    }
+
+    for (var connectedID in connectedDictionary){
+      connectedDictionary[connectedID] = connectedDictionary[connectedID] - 1;
+      console.log("connectedDictionary: " + connectedDictionary[connectedID]);
+      if(connectedDictionary[connectedID]==0){
+        //remove the item from the dictionary
+        console.log("REACHED INSIDE FOR THE 0 CONDITION FOR CONNECTED");
+        delete connectedDictionary[connectedID];
+      }
+    }
+  }, 10000);
+
+
+
+
+
   // Useful for both createPost and editPost actions.
   // Whenever a user wants to edit a post, it is safe to reuse this function
   function post() {
@@ -127,18 +180,27 @@ $(document).ready(function() {
   function setProfile () {
     console.log("setting profile");
     email = gUserProfile.getEmail();
-    condition = email.indexOf("@berkeley.edu") !== -1
+    socket.emit('check duplicate', {googleUserID: gUserID});
 
-    // If the email is valid, fade out page
-    if (true) {
-      console.log("user is a berkeley student");
-      $loginPage.fadeOut();
-      $joinPage.show();
-      $loginPage.off('click');
-    } else {
-      alert("Sorry, you're not a Berkeley student!");
-      console.log("user is not a berkeley student");
-    }
+    socket.on('duplicate user', function check(info){
+      var condition = info.condition;
+      if(condition == true){
+        alert("You've logged in already.");
+        console.log("number of times")
+      } else {
+        // If the email is valid, fade out page
+        if (email.indexOf("@berkeley.edu") !== -1) {
+          console.log("user is a berkeley student");
+          $loginPage.fadeOut();
+          $joinPage.show();
+          $loginPage.off('click');
+          socket.emit('active user', {googleUserID: gUserID});
+        } else {
+          alert("Sorry, you're not a Berkeley student!");
+          console.log("user is not a berkeley student");
+        }
+      }
+    });
   }
 
   // Prevents input from having injected markup
@@ -217,35 +279,50 @@ $(document).ready(function() {
     var requestorID = info.requestorID;
     var requestorName = info.requestorName;
 
-    var name = gUserProfile.getName();
-    addToLog(requestorName + " wants to meet up with you! You can accept or ignore.");
+    if (requestorID in spamDictionary == false){
+      var name = gUserProfile.getName();
+      addToLog(requestorName + " wants to meet up with you! You can accept or ignore.");
 
-    // unbind listeners first
-    $('#acceptPing').off('click');
-    $('#ignorePing').off('click');
+      // unbind listeners first
+      $('#acceptPing').off('click');
+      $('#ignorePing').off('click');
 
-    // functions for USER to accept or ignore ping from OTHER;
-    $('#acceptPing').on('click', function (e) {
-      socket.emit('accept ping', {
-        wantedName: name,
-        requestorName: requestorName,
-        wantedID: gUserID,
-        requestorID: requestorID
+      // functions for USER to accept or ignore ping from OTHER;
+      $('#acceptPing').on('click', function (e) {
+        // some function in here to add to connectedDictionary... timeout = 100 minutes
+        addConnectedDictionary(requestorID);
+
+        socket.emit('accept ping', {
+          wantedName: name,
+          requestorName: requestorName,
+          wantedID: gUserID,
+          requestorID: requestorID
+        });
+        $('#receivePing').css("display", "none");
       });
-      $('#receivePing').css("display", "none");
-    });
-    $('#ignorePing').on('click', function (e) {
-      $('#receivePing').css("display", "none");
-    });
+      $('#ignorePing').on('click', function (e) {
+        // some function in here to add to spamDictionary... timeout = 1 minutes
+        addSpamDictionary(requestorID);
 
-    // display the ping via popup
-    $('#receivePingText').text(requestorName + " wants to meet up with you!");
-    $('#receivePing').css("display", "block");
+        $('#receivePing').css("display", "none");
+      });
+
+      // display the ping via popup
+      $('#receivePingText').text(requestorName + " wants to meet up with you!");
+      $('#receivePing').css("display", "block");
+  } // do nothing if requestorID is in spamDictionary
+
   });
 
   socket.on('receive ack', function receiveAck(info){
     var name = info.name;
     var email = info.email;
+    var idInfo = info.id;
+
+    if(spamDictionary[idInfo] !== null){
+      delete spamDictionary[idInfo];
+    }
+    addConnectedDictionary(idInfo);
 
     addToLog("Great, " + name + " wants to meet with you! Their email is: " + email);
   });

@@ -105,8 +105,11 @@ function server(request, response) {
       >>>VARIABLES<<<
 */
 var webpage = http.createServer(server);
-var googleDict = {}; //keeps track of all online users and their connection sockets {userID: [socketID, email]}
+//keeps track of all online users and their connection sockets {userID: [socketID, email]}
 //stores only publicID info for all users and their corresponding posts
+var googleDict = {}; 
+//stores active users regardless of whether they've entered a space or not
+var activeUsers = new Set();
 var spaceDict = {
   'Cory Hall': null,
   'Soda Hall': null,
@@ -145,12 +148,31 @@ io.on('connection', function(socket) {
     //will need to use json-sockets with this
     socket.emit('welcome', {message: 'Welcome to CourseConnect!'});
 
+
+    socket.on('active user', function addActive(info){
+      var activeID = info.googleUserID;
+      activeUsers.add(activeID);
+    });
+
+
     //send to the client the list of users of each user every 10 seconds
     setInterval(
       function peopleInSpaces() {
         //returns key-value pair called "dictionary," which is a dictionary of rooms-numPeople
         socket.emit('spaces', {dictionary: getNumPeople()} );
     }, 1000);
+
+
+    socket.on('check duplicate', function check(info){
+      guid = info.googleUserID;
+      if(activeUsers.has(guid)){
+        console.log("duplicate is " + true);
+        socket.emit('duplicate user', {condition: true});
+    } else {
+        console.log("duplicate is " + false);
+        socket.emit('duplicate user', {condition: false});
+    }
+  });
 
     //listen for the userID data
     //consolidate and compile received client data to a set
@@ -162,7 +184,7 @@ io.on('connection', function(socket) {
 
       if(spaceDict[studySpace] === null || spaceDict[studySpace] === undefined){
         spaceDict[studySpace] = [[publicUserID, posting]];
-      }else{
+      } else {
         // if user already exists, remove it (so it can later be replaced)
         if (publicUserID in spaceDict[studySpace]) {
           spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
@@ -174,7 +196,7 @@ io.on('connection', function(socket) {
 
 
     socket.on('remove user', function removeUser(info){
-      var publicUserID = info.googleUserID; //NEED TO FIGURE OUT GOOGLE ID STUFF... this should be public info
+      var publicUserID = info.googleUserID;
       var studySpace = info.studySpace;
       var posting = info.posting;
 
@@ -182,7 +204,12 @@ io.on('connection', function(socket) {
         // remove the user in this space by publicUserID
         var list = spaceDict[studySpace];
         spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
-        delete googleDict.publicUserID;
+        delete googleDict[publicUserID];
+      }
+
+      //added stuff to delete added things in activeUsers
+      if(activeUsers.has(publicUserID)){
+        activeUsers.delete(publicUserID);
       }
     });
 
@@ -233,8 +260,8 @@ io.on('connection', function(socket) {
       var requestorEmail = googleDict[requestorID][1];
 
       // send acks to both users
-      googleDict[requestorID][0].emit('receive ack', {name: wantedName, email: wantedEmail});
-      googleDict[wantedID][0].emit('receive ack', {name: requestorName, email: requestorEmail});
+      googleDict[requestorID][0].emit('receive ack', {name: wantedName, email: wantedEmail, id: wantedID});
+      googleDict[wantedID][0].emit('receive ack', {name: requestorName, email: requestorEmail, id: requestorID});
     });
 }); // end "connection"
 
