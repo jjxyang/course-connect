@@ -239,7 +239,7 @@ io.on('connection', function(socket) {
 
       // save this interval so it can be canceled later
       showSpaceInterval = setInterval(function showSpaceStuff() {
-        // console.log("showing space stuff for", space);
+        console.log("showing space stuff for", space);
         socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space]})
       }, 1000);
     });
