@@ -260,8 +260,17 @@ $(document).ready(function() {
   }
 
   function addToLog(message) {
+    // format a timestamp
+    var date = new Date();
+    var min = date.getMinutes().toString();
+    min = min.length < 2 ? ("0" + min) : min;
+    var sec = date.getSeconds().toString();
+    sec = sec.length < 2 ? ("0" + sec) : sec;
+    var timestamp = "[" + date.getHours() + ":" + min + ":" + sec + "] ";
+
+    // add new message elem to log
     $('#messages').append(
-      '<li class="list-group-item">' + message + '</li>'
+      '<li class="list-group-item">' + timestamp + message + '</li>'
     );
   }
 
