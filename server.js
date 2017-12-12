@@ -26,10 +26,9 @@ function sendFileContent(response, fileName, contentType){
 
 //ensures that the webpage is one of several valid paths
 function verifyWebpage(param){
-  if(param === "/"
-    || param === "/index.html"
-    //|| param === "SCHOOL-LOCATIONS-HERE.HTML"
-    ){
+  if (param == "/"
+    || param == "/index.html"
+    || param == "/about.html") {
     return true;
   }
   return false;
