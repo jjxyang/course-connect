@@ -106,7 +106,7 @@ function server(request, response) {
 var webpage = http.createServer(server);
 //keeps track of all online users and their connection sockets {userID: [socketID, email]}
 //stores only publicID info for all users and their corresponding posts
-var googleDict = {}; 
+var googleDict = {};
 //stores active users regardless of whether they've entered a space or not
 var activeUsers = new Set();
 var spaceDict = {

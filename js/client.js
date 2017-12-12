@@ -1,26 +1,22 @@
 $(document).ready(function() {
-  var FADE_TIME = 150; // ms
-
-  // Initialize variables
+  var socket = io();
   var $window = $(window);
-  var $loginPage = $('.login.page'); // the login page
-  var $joinPage = $('.join.page'); // the join page
+  var $loginPage = $('.login.page');     // the login page
+  var $joinPage = $('.join.page');       // the join page
   var $connectPage = $('.connect.page'); // the connect page
-  
+
   var spamDictionary = {};
-  var connectedDictionary = {};
-  var spaceDictionary = {};
-  var gUserProfile;
-  var gUserID;
-  var email;
-  var chosenSpace;
-  var userPosting = null;
+  var connectedDictionary = {};         // dict of who user has connected to
+  var spaceDictionary = {};             // list of spaces and members in it
+  var gUserProfile;                     // google user profile
+  var gUserID;                          // google user ID
+  var email;                            // user's email
+  var chosenSpace;                      // user's current space
+  var userPosting = null;               // user's posting with topic, category, status
   var connected = false;
 
-  var socket = io();
 
   // ------------------------ LOGIN PAGE ------------------------
-  // temp signin button
   $('#enter').on('click', function (e) {
     setProfile();
   });
@@ -39,6 +35,7 @@ $(document).ready(function() {
     console.log("Email: " + gUserProfile.getEmail());
     console.log("signed in!");
   };
+  // ------------------------------------------------------------
 
 
   // ------------------------ JOIN PAGE -------------------------
@@ -63,12 +60,23 @@ $(document).ready(function() {
     chosenSpace = 'Doe Library';
     showStudySpace(chosenSpace);
   });
+  // ------------------------------------------------------------
 
 
   // ------------------------ CONNECT PAGE ----------------------
   $('#editPosting').on('click', function (e) {
     goToEditPosting();
   });
+
+  // function call to editPost
+  function goToEditPosting() {
+    console.log("going back to edit posting, removing user's current posting");
+    $connectPage.hide();
+    $connectPage.off('click');
+    $joinPage.fadeToggle();
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  }
+  // ------------------------------------------------------------
 
 
   // emits user's chosen space and posting to the server
@@ -120,61 +128,29 @@ $(document).ready(function() {
     connectedDictionary[inputID] = 600; //600 = 100 minutes
   }
 
-  setInterval(
-    function decrementDictionaries() {
-    for (var spamID in spamDictionary){
+  setInterval(function decrementDictionaries() {
+    for (var spamID in spamDictionary) {
       spamDictionary[spamID] = spamDictionary[spamID] - 1;
       console.log("spamDictionary: " + spamDictionary[spamID]);
-      if(spamDictionary[spamID] ==0 || spamDictionary == undefined){
+      if (spamDictionary[spamID] == 0 || spamDictionary == undefined) {
         //remove the item from the dictionary
         console.log("REACHED INSIDE FOR THE 0 CONDITION FOR SPAM");
         delete spamDictionary[spamID];
       }
     }
 
-    for (var connectedID in connectedDictionary){
+    for (var connectedID in connectedDictionary) {
       connectedDictionary[connectedID] = connectedDictionary[connectedID] - 1;
       console.log("connectedDictionary: " + connectedDictionary[connectedID]);
-      if(connectedDictionary[connectedID]==0){
+      if (connectedDictionary[connectedID] == 0) {
         //remove the item from the dictionary
         console.log("REACHED INSIDE FOR THE 0 CONDITION FOR CONNECTED");
         delete connectedDictionary[connectedID];
       }
     }
   }, 10000);
+  // ------------------------------------------------------------
 
-
-
-
-
-  // Useful for both createPost and editPost actions.
-  // Whenever a user wants to edit a post, it is safe to reuse this function
-  function post() {
-    var name = gUserProfile.getGivenName();
-    var topic = $('#topic').val();
-    var category = $('#category').val();
-    var status = $('input[name=status]:checked', '#statusChoice').val();
-
-    // format name
-    name = name.toLowerCase();
-    name = name.charAt(0).toUpperCase() + name.slice(1);
-    topic = cleanInput(topic);
-
-    // verify topic is not empty
-    if (topic === "") {
-      alert("Please choose a class or topic.");
-      return undefined;
-    } else {
-      var posting = {
-        name: name,
-        topic: topic,
-        category: category,
-        status: status
-      }
-      userPosting = posting;
-      return posting
-    }
-  }
 
   // Sets the client's google profile
   function setProfile () {
@@ -203,9 +179,33 @@ $(document).ready(function() {
     });
   }
 
-  // Prevents input from having injected markup
-  function cleanInput (input) {
-    return $('<div/>').text(input).html();
+  // Useful for both createPost and editPost actions.
+  // Whenever a user wants to edit a post, it is safe to reuse this function
+  function post() {
+    var name = gUserProfile.getGivenName();
+    var topic = $('#topic').val();
+    var category = $('#category').val();
+    var status = $('input[name=status]:checked', '#statusChoice').val();
+
+    // format name
+    name = name.toLowerCase();
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    topic = cleanInput(topic);
+
+    // verify topic is not empty
+    if (topic === "") {
+      alert("Please choose a class or topic.");
+      return undefined;
+    } else {
+      var posting = {
+        name: name,
+        topic: topic,
+        category: category,
+        status: status
+      }
+      userPosting = posting;
+      return posting
+    }
   }
 
 
@@ -259,12 +259,14 @@ $(document).ready(function() {
 
   socket.on('show space stuff', spaceStuff);
 
-  //should emit the event 'remove user' to server
+  // should emit the event 'remove user' to server when user leaves/refreshes page
   window.addEventListener("beforeunload", function (e) {
     socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
     return;
   });
 
+
+  // ------------------------ PING SYSTEM -----------------------
   // THIS USER wants to connect to SOMEONE ELSE
   function requestConnection(otherUserID, otherUserName) {
     console.log("requesting connection with", otherUserName);
@@ -326,14 +328,12 @@ $(document).ready(function() {
 
     addToLog("Great, " + name + " wants to meet with you! Their email is: " + email);
   });
+  // ------------------------------------------------------------
 
-  // function call to editPost
-  function goToEditPosting() {
-    console.log("going back to edit posting, removing user's current posting");
-    $connectPage.hide();
-    $connectPage.off('click');
-    $joinPage.fadeToggle();
-    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  
+  // Prevents input from having injected markup
+  function cleanInput (input) {
+    return $('<div/>').text(input).html();
   }
 
   function addToLog(message) {
