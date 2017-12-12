@@ -75,15 +75,22 @@ ul {
 }
 
 .join.page .label {
-  margin-top: 10px;
+  margin: 10px;
   color: #fff;
   font-size: 100%;
   text-align: right;
   float: left;
 }
 
+.join.page .radio-label {
+  margin: 5px;
+  color: #fff;
+  text-align: right;
+  float: left;
+}
+
 .join.page .input {
-  margin-top: 10px;
+  margin: 10px;
   color: #000;
   font-size: 100%;
 }
