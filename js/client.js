@@ -218,7 +218,7 @@ $(document).ready(function() {
     var requestorName = info.requestorName;
 
     var name = gUserProfile.getName();
-    addToLog(requestorName + " wants to meet up with you!");
+    addToLog(requestorName + " wants to meet up with you! You can accept or ignore.");
 
     // unbind listeners first
     $('#acceptPing').off('click');
