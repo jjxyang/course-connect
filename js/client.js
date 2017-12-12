@@ -89,8 +89,6 @@ $(document).ready(function() {
   function showStudySpace(chosenSpace) {
     console.log("going to study space", chosenSpace);
     console.log("number of people", spaceDictionary[chosenSpace]);
-
-
     socket.emit('chosen space', {studySpace: chosenSpace});
 
     // set title of page to be the chosen studySpace
@@ -174,7 +172,6 @@ $(document).ready(function() {
     console.log("receiving if user is a duplicate", info.condition);
     if (info.condition) {
       alert("You've logged in already.");
-      console.log("number of times")
     } else {
       // If the email is valid, fade out page
       if (email.indexOf("@berkeley.edu") !== -1) {
@@ -230,7 +227,6 @@ $(document).ready(function() {
 
   socket.on('spaces', function readSpaces(info){
     spaceDictionary = info.dictionary;
-    // console.log(spaceDictionary);
 
     $("#coryHallPeople").text(spaceDictionary[cory]);
     $("#sodaHallPeople").text(spaceDictionary[soda]);
@@ -239,18 +235,7 @@ $(document).ready(function() {
     $("#doeLibraryPeople").text(spaceDictionary[doe]);
 
     $("#numPeopleInRoom").text(spaceDictionary[chosenSpace]);
-
-    console.log(spaceDictionary[cory]);
-    console.log(spaceDictionary[soda]);
-    console.log(spaceDictionary[mlk]);
-    console.log(spaceDictionary[moffitt]);
-    console.log(spaceDictionary[doe]);
-    console.log(spaceDictionary[chosenSpace]);
   });
-
-  // setInterval(function checkLog(){
-  //     console.log(spaceDictionary);
-  // }, 1000);
 
   function spaceStuff(info){
     var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
