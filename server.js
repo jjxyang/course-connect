@@ -199,23 +199,27 @@ io.on('connection', function(socket) {
       var publicUserID = info.googleUserID;
       var studySpace = info.studySpace;
       var posting = info.posting;
+      var socketID = info.socketID;
 
-      if(spaceDict[studySpace] != null && spaceDict[studySpace] != undefined) {
-        // remove the user in this space by publicUserID
-        var list = spaceDict[studySpace];
-        spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
-        delete googleDict[publicUserID];
-      }
+      if(googleDict[publicUserID][0] == socketID){
 
-      //added stuff to delete added things in activeUsers
-      if(activeUsers.has(publicUserID)){
-        activeUsers.delete(publicUserID);
-      }
+        if(spaceDict[studySpace] != null && spaceDict[studySpace] != undefined) {
+          // remove the user in this space by publicUserID
+          var list = spaceDict[studySpace];
+          spaceDict[studySpace] = list.filter(el => el[0] !== publicUserID);
+          delete googleDict[publicUserID];
+        }
 
-      // clear timed interval for 'show space stuff' socket emission
-      if (showSpaceInterval != null) {
-        clearInterval(showSpaceInterval);
-      }
+        //added stuff to delete added things in activeUsers
+        if(activeUsers.has(publicUserID)){
+          activeUsers.delete(publicUserID);
+        }
+
+        // clear timed interval for 'show space stuff' socket emission
+        if (showSpaceInterval != null) {
+          clearInterval(showSpaceInterval);
+        }
+    }
     });
 
 

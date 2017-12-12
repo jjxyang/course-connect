@@ -302,7 +302,7 @@ $(document).ready(function() {
 
   // should emit the event 'remove user' to server when user leaves/refreshes page
   window.addEventListener("beforeunload", function (e) {
-    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting, socketID: socket});
     return;
   });
 
