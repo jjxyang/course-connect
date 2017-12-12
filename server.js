@@ -106,7 +106,7 @@ function server(request, response) {
 var webpage = http.createServer(server);
 //keeps track of all online users and their connection sockets {userID: [socketID, email]}
 //stores only publicID info for all users and their corresponding posts
-var googleDict = {}; 
+var googleDict = {};
 //stores active users regardless of whether they've entered a space or not
 var activeUsers = new Set();
 var spaceDict = {
@@ -116,6 +116,7 @@ var spaceDict = {
   'Moffitt Library': null,
   'Doe Library': null
 };
+var showSpaceInterval = null;
 
 /*
       >>>SERVER HELPER FUNCTIONS<<<
@@ -147,13 +148,6 @@ io.on('connection', function(socket) {
     //will need to use json-sockets with this
     socket.emit('welcome', {message: 'Welcome to CourseConnect!'});
 
-
-    socket.on('active user', function addActive(info){
-      var activeID = info.googleUserID;
-      activeUsers.add(activeID);
-    });
-
-
     //send to the client the list of users of each user every 10 seconds
     setInterval(
       function peopleInSpaces() {
@@ -161,17 +155,24 @@ io.on('connection', function(socket) {
         socket.emit('spaces', {dictionary: getNumPeople()} );
     }, 1000);
 
+    socket.on('active user', function addActive(info) {
+      console.log("adding active user", info.googleUserID);
+      var activeID = info.googleUserID;
+      activeUsers.add(activeID);
+    });
 
-    socket.on('check duplicate', function check(info){
+
+    socket.on('check duplicate', function check(info) {
       guid = info.googleUserID;
-      if(activeUsers.has(guid)){
+      console.log("activeUsers", activeUsers);
+      if (activeUsers.has(guid)) {
         console.log("duplicate is " + true);
         socket.emit('duplicate user', {condition: true});
-    } else {
+      } else {
         console.log("duplicate is " + false);
         socket.emit('duplicate user', {condition: false});
-    }
-  });
+      }
+    });
 
     //listen for the userID data
     //consolidate and compile received client data to a set
@@ -210,6 +211,11 @@ io.on('connection', function(socket) {
       if(activeUsers.has(publicUserID)){
         activeUsers.delete(publicUserID);
       }
+
+      // clear timed interval for 'show space stuff' socket emission
+      if (showSpaceInterval != null) {
+        clearInterval(showSpaceInterval);
+      }
     });
 
 
@@ -231,10 +237,11 @@ io.on('connection', function(socket) {
     socket.on('chosen space', function getPostingsList(data){
       var space = data.studySpace;
 
-      setInterval(
-        function showSpaceStuff(){
-          socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space] })
-        }, 1000);
+      // save this interval so it can be canceled later
+      showSpaceInterval = setInterval(function showSpaceStuff() {
+        // console.log("showing space stuff for", space);
+        socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space]})
+      }, 1000);
     });
 
 
