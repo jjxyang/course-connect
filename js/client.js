@@ -90,7 +90,7 @@ $(document).ready(function() {
       console.log("adding user");
       socket.emit("add user", data);
 
-      $joinPage.fadeOut();
+      $joinPage.fadeToggle();
       $connectPage.show();
       $joinPage.off('click');
     }
@@ -298,18 +298,18 @@ $(document).ready(function() {
           wantedID: gUserID,
           requestorID: requestorID
         });
-        $('#receivePing').css("display", "none");
+        $('#receivePing').hide();
       });
       $('#ignorePing').on('click', function (e) {
         // some function in here to add to spamDictionary... timeout = 1 minutes
         addSpamDictionary(requestorID);
 
-        $('#receivePing').css("display", "none");
+        $('#receivePing').hide();
       });
 
       // display the ping via popup
       $('#receivePingText').text(requestorName + " wants to meet up with you!");
-      $('#receivePing').css("display", "block");
+      $('#receivePing').show();
   } // do nothing if requestorID is in spamDictionary
 
   });
@@ -330,9 +330,9 @@ $(document).ready(function() {
   // function call to editPost
   function goToEditPosting() {
     console.log("going back to edit posting, removing user's current posting");
-    $connectPage.fadeOut();
-    $joinPage.show();
+    $connectPage.hide();
     $connectPage.off('click');
+    $joinPage.fadeToggle();
     socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
   }
 
