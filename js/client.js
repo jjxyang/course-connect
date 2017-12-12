@@ -15,10 +15,15 @@ $(document).ready(function() {
   var userPosting = null;               // user's posting with topic, category, status
   var connected = false;
 
+  var cory = 'Cory Hall';
+  var soda = 'Soda Hall';
+  var mlk = 'MLK Student Union';
+  var moffitt = 'Moffitt Library';
+  var doe = 'Doe Library';
 
   // ------------------------ LOGIN PAGE ------------------------
   $('#enter').on('click', function (e) {
-    setProfile();
+    checkIfDuplicateUser();
   });
 
   // google auth signin
@@ -40,25 +45,26 @@ $(document).ready(function() {
 
   // ------------------------ JOIN PAGE -------------------------
   // takes user to the chosen space
+
   $('#coryHall').on('click', function (e) {
-    chosenSpace = 'Cory Hall';
-    showStudySpace(chosenSpace);
+    chosenSpace = cory;
+    showStudySpace(cory);
   });
   $('#sodaHall').on('click', function (e) {
-    chosenSpace = 'Soda Hall';
-    showStudySpace(chosenSpace);
+    chosenSpace = soda;
+    showStudySpace(soda);
   });
   $('#mlk').on('click', function (e) {
-    chosenSpace = 'MLK Student Union';
-    showStudySpace(chosenSpace);
+    chosenSpace = mlk;
+    showStudySpace(mlk);
   });
   $('#moffittLibrary').on('click', function (e) {
-    chosenSpace = 'Moffitt Library';
-    showStudySpace(chosenSpace);
+    chosenSpace = moffitt;
+    showStudySpace(moffitt);
   });
   $('#doeLibrary').on('click', function (e) {
-    chosenSpace = 'Doe Library';
-    showStudySpace(chosenSpace);
+    chosenSpace = doe;
+    showStudySpace(doe);
   });
   // ------------------------------------------------------------
 
@@ -82,6 +88,9 @@ $(document).ready(function() {
   // emits user's chosen space and posting to the server
   function showStudySpace(chosenSpace) {
     console.log("going to study space", chosenSpace);
+    console.log("number of people", spaceDictionary[chosenSpace]);
+
+
     socket.emit('chosen space', {studySpace: chosenSpace});
 
     // set title of page to be the chosen studySpace
@@ -152,32 +161,36 @@ $(document).ready(function() {
   // ------------------------------------------------------------
 
 
-  // Sets the client's google profile
-  function setProfile () {
+  // Sets the client's google profile, works with "duplicate user" event
+  function checkIfDuplicateUser () {
     console.log("setting profile");
     email = gUserProfile.getEmail();
     socket.emit('check duplicate', {googleUserID: gUserID});
-
-    socket.on('duplicate user', function check(info){
-      var condition = info.condition;
-      if(condition == true){
-        alert("You've logged in already.");
-        console.log("number of times")
-      } else {
-        // If the email is valid, fade out page
-        if (email.indexOf("@berkeley.edu") !== -1) {
-          console.log("user is a berkeley student");
-          $loginPage.fadeOut();
-          $joinPage.show();
-          $loginPage.off('click');
-          socket.emit('active user', {googleUserID: gUserID});
-        } else {
-          alert("Sorry, you're not a Berkeley student!");
-          console.log("user is not a berkeley student");
-        }
-      }
-    });
   }
+
+  // sets user profile only if:
+  // (1) user hasn't logged in already, (2) user has berkeley email
+  function setProfile(info) {
+    console.log("receiving if user is a duplicate", info.condition);
+    if (info.condition) {
+      alert("You've logged in already.");
+      console.log("number of times")
+    } else {
+      // If the email is valid, fade out page
+      if (email.indexOf("@berkeley.edu") !== -1) {
+        console.log("user is a berkeley student");
+        $loginPage.fadeOut();
+        $joinPage.show();
+        $loginPage.off('click');
+        socket.emit('active user', {googleUserID: gUserID});
+      } else {
+        alert("Sorry, you're not a Berkeley student!");
+        console.log("user is not a berkeley student");
+      }
+    }
+  }
+  socket.on('duplicate user', setProfile);
+
 
   // Useful for both createPost and editPost actions.
   // Whenever a user wants to edit a post, it is safe to reuse this function
@@ -216,8 +229,28 @@ $(document).ready(function() {
   });
 
   socket.on('spaces', function readSpaces(info){
-    spaceDictionary = info.dictionary
+    spaceDictionary = info.dictionary;
+    // console.log(spaceDictionary);
+
+    $("#coryHallPeople").text(spaceDictionary[cory]);
+    $("#sodaHallPeople").text(spaceDictionary[soda]);
+    $("#mlkPeople").text(spaceDictionary[mlk]);
+    $("#moffittLibraryPeople").text(spaceDictionary[moffitt]);
+    $("#doeLibraryPeople").text(spaceDictionary[doe]);
+
+    $("#numPeopleInRoom").text(spaceDictionary[chosenSpace]);
+
+    console.log(spaceDictionary[cory]);
+    console.log(spaceDictionary[soda]);
+    console.log(spaceDictionary[mlk]);
+    console.log(spaceDictionary[moffitt]);
+    console.log(spaceDictionary[doe]);
+    console.log(spaceDictionary[chosenSpace]);
   });
+
+  // setInterval(function checkLog(){
+  //     console.log(spaceDictionary);
+  // }, 1000);
 
   function spaceStuff(info){
     var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
@@ -250,10 +283,18 @@ $(document).ready(function() {
 
       // unbind existing click listeners
       $('#postings').off('click', '#' + userID);
-      // add new click listener to the 'connect' button of each div
-      $('#postings').on('click', '#' + userID, function (e) {
-        requestConnection($(this).attr("id"), $(this).parent().attr("id"));
-      });
+      // check if this is the current user's ID or not
+      if (userID != gUserID) {
+        // add new click listener to the 'connect' button of each div
+        $('#postings').on('click', '#' + userID, function (e) {
+          requestConnection($(this).attr("id"), $(this).parent().attr("id"));
+        });
+      } else {
+        // user shouldn't be able to ping themselves; change button attributes
+        $('#' + userID).removeClass("btn-info");
+        $('#' + userID).addClass("btn-success");
+        $('#' + userID).text("Your posting!");
+      }
     }
   };
 
@@ -312,8 +353,7 @@ $(document).ready(function() {
       // display the ping via popup
       $('#receivePingText').text(requestorName + " wants to meet up with you!");
       $('#receivePing').show();
-  } // do nothing if requestorID is in spamDictionary
-
+    } // do nothing if requestorID is in spamDictionary
   });
 
   socket.on('receive ack', function receiveAck(info){
@@ -330,7 +370,7 @@ $(document).ready(function() {
   });
   // ------------------------------------------------------------
 
-  
+
   // Prevents input from having injected markup
   function cleanInput (input) {
     return $('<div/>').text(input).html();
