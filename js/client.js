@@ -312,8 +312,7 @@ $(document).ready(function() {
       // display the ping via popup
       $('#receivePingText').text(requestorName + " wants to meet up with you!");
       $('#receivePing').show();
-  } // do nothing if requestorID is in spamDictionary
-
+    } // do nothing if requestorID is in spamDictionary
   });
 
   socket.on('receive ack', function receiveAck(info){
@@ -330,7 +329,7 @@ $(document).ready(function() {
   });
   // ------------------------------------------------------------
 
-  
+
   // Prevents input from having injected markup
   function cleanInput (input) {
     return $('<div/>').text(input).html();
