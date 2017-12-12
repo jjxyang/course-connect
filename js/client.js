@@ -17,6 +17,12 @@ $(document).ready(function() {
   var userPosting = null;
   var connected = false;
 
+  var cory = 'Cory Hall';
+  var soda = 'Soda Hall';
+  var mlk = 'MLK Student Union';
+  var moffitt = 'Moffitt Library';
+  var doe = 'Doe Library';
+
   var socket = io();
 
   // ------------------------ LOGIN PAGE ------------------------
@@ -43,25 +49,26 @@ $(document).ready(function() {
 
   // ------------------------ JOIN PAGE -------------------------
   // takes user to the chosen space
+
   $('#coryHall').on('click', function (e) {
-    chosenSpace = 'Cory Hall';
-    showStudySpace(chosenSpace);
+    chosenSpace = cory;
+    showStudySpace(cory);
   });
   $('#sodaHall').on('click', function (e) {
-    chosenSpace = 'Soda Hall';
-    showStudySpace(chosenSpace);
+    chosenSpace = soda;
+    showStudySpace(soda);
   });
   $('#mlk').on('click', function (e) {
-    chosenSpace = 'MLK Student Union';
-    showStudySpace(chosenSpace);
+    chosenSpace = mlk;
+    showStudySpace(mlk);
   });
   $('#moffittLibrary').on('click', function (e) {
-    chosenSpace = 'Moffitt Library';
-    showStudySpace(chosenSpace);
+    chosenSpace = moffitt;
+    showStudySpace(moffitt);
   });
   $('#doeLibrary').on('click', function (e) {
-    chosenSpace = 'Doe Library';
-    showStudySpace(chosenSpace);
+    chosenSpace = doe;
+    showStudySpace(doe);
   });
 
 
@@ -74,6 +81,9 @@ $(document).ready(function() {
   // emits user's chosen space and posting to the server
   function showStudySpace(chosenSpace) {
     console.log("going to study space", chosenSpace);
+    console.log("number of people", spaceDictionary[chosenSpace]);
+
+
     socket.emit('chosen space', {studySpace: chosenSpace});
 
     // set title of page to be the chosen studySpace
@@ -142,9 +152,6 @@ $(document).ready(function() {
       }
     }
   }, 10000);
-
-
-
 
 
   // Useful for both createPost and editPost actions.
@@ -216,8 +223,28 @@ $(document).ready(function() {
   });
 
   socket.on('spaces', function readSpaces(info){
-    spaceDictionary = info.dictionary
+    spaceDictionary = info.dictionary;
+    // console.log(spaceDictionary);
+
+    $("#coryHallPeople").text(spaceDictionary[cory]);
+    $("#sodaHallPeople").text(spaceDictionary[soda]);
+    $("#mlkPeople").text(spaceDictionary[mlk]);
+    $("#moffittLibraryPeople").text(spaceDictionary[moffitt]);
+    $("#doeLibraryPeople").text(spaceDictionary[doe]);
+
+    $("#numPeopleInRoom").text(spaceDictionary[chosenSpace]);
+
+    console.log(spaceDictionary[cory]);
+    console.log(spaceDictionary[soda]);
+    console.log(spaceDictionary[mlk]);
+    console.log(spaceDictionary[moffitt]);
+    console.log(spaceDictionary[doe]);
+    console.log(spaceDictionary[chosenSpace]);
   });
+
+  // setInterval(function checkLog(){
+  //     console.log(spaceDictionary);
+  // }, 1000);
 
   function spaceStuff(info){
     var postsList = info.posts; //contains a list of all [user, post] entries from the server... ie. [[user, post]...]
