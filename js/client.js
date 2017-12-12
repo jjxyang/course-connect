@@ -87,15 +87,10 @@ $(document).ready(function() {
 
   // emits user's chosen space and posting to the server
   function showStudySpace(chosenSpace) {
-    console.log("going to study space", chosenSpace);
-    console.log("number of people", spaceDictionary[chosenSpace]);
-    socket.emit('chosen space', {studySpace: chosenSpace});
-
-    // set title of page to be the chosen studySpace
-    $("#studySpaceName").text(chosenSpace);
-
     var posting = post();
-    if (posting !== undefined && posting !== null) {
+
+    // only go to study space if posting is valid
+    if (posting != undefined && posting != null) {
       var data = {
         googleUserID: gUserID,
         gmail: email,
@@ -104,6 +99,12 @@ $(document).ready(function() {
       };
       console.log("adding user");
       socket.emit("add user", data);
+
+      // set title of page to be the chosen studySpace
+      $("#studySpaceName").text(chosenSpace);
+      console.log("going to study space", chosenSpace);
+      console.log("number of people", spaceDictionary[chosenSpace]);
+      socket.emit('chosen space', {studySpace: chosenSpace});
 
       $joinPage.fadeToggle();
       $connectPage.show();
