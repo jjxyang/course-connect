@@ -253,10 +253,18 @@ $(document).ready(function() {
 
       // unbind existing click listeners
       $('#postings').off('click', '#' + userID);
-      // add new click listener to the 'connect' button of each div
-      $('#postings').on('click', '#' + userID, function (e) {
-        requestConnection($(this).attr("id"), $(this).parent().attr("id"));
-      });
+      // check if this is the current user's ID or not
+      if (userID != gUserID) {
+        // add new click listener to the 'connect' button of each div
+        $('#postings').on('click', '#' + userID, function (e) {
+          requestConnection($(this).attr("id"), $(this).parent().attr("id"));
+        });
+      } else {
+        // user shouldn't be able to ping themselves; change button attributes
+        $('#' + userID).removeClass("btn-info");
+        $('#' + userID).addClass("btn-success");
+        $('#' + userID).text("Your posting!");
+      }
     }
   };
 
