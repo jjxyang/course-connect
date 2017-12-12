@@ -116,6 +116,7 @@ var spaceDict = {
   'Moffitt Library': null,
   'Doe Library': null
 };
+var showSpaceInterval = null;
 
 /*
       >>>SERVER HELPER FUNCTIONS<<<
@@ -147,19 +148,17 @@ io.on('connection', function(socket) {
     //will need to use json-sockets with this
     socket.emit('welcome', {message: 'Welcome to CourseConnect!'});
 
-
-    socket.on('active user', function addActive(info){
-      var activeID = info.googleUserID;
-      activeUsers.add(activeID);
-    });
-
-
     //send to the client the list of users of each user every 10 seconds
     setInterval(
       function peopleInSpaces() {
         //returns key-value pair called "dictionary," which is a dictionary of rooms-numPeople
         socket.emit('spaces', {dictionary: getNumPeople()} );
     }, 1000);
+
+    socket.on('active user', function addActive(info){
+      var activeID = info.googleUserID;
+      activeUsers.add(activeID);
+    });
 
 
     socket.on('check duplicate', function check(info){
@@ -210,6 +209,11 @@ io.on('connection', function(socket) {
       if(activeUsers.has(publicUserID)){
         activeUsers.delete(publicUserID);
       }
+
+      // clear timed interval for 'show space stuff' socket emission
+      if (showSpaceInterval != null) {
+        clearInterval(showSpaceInterval);
+      }
     });
 
 
@@ -231,10 +235,11 @@ io.on('connection', function(socket) {
     socket.on('chosen space', function getPostingsList(data){
       var space = data.studySpace;
 
-      setInterval(
-        function showSpaceStuff(){
-          socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space] })
-        }, 1000);
+      // save this interval so it can be canceled later
+      showSpaceInterval = setInterval(function showSpaceStuff() {
+        // console.log("showing space stuff for", space);
+        socket.emit('show space stuff', {posts: spaceDict[space], numPeople: getNumPeople()[space]})
+      }, 1000);
     });
 
 
