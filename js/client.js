@@ -6,9 +6,11 @@ $(document).ready(function() {
   var $loginPage = $('.login.page'); // the login page
   var $joinPage = $('.join.page'); // the join page
   var $connectPage = $('.connect.page'); // the connect page
-
+  
+  var spamDictionary = {};
+  var connectedDictionary = {};
   var spaceDictionary = {};
-  var gUser;
+  var gUserProfile;
   var gUserID;
   var email;
   var chosenSpace;
@@ -17,10 +19,7 @@ $(document).ready(function() {
 
   var socket = io();
 
-  var spamDictionary = {};
-  var connectedDictionary = {};
-
-
+  // ------------------------ LOGIN PAGE ------------------------
   // temp signin button
   $('#enter').on('click', function (e) {
     setProfile();
@@ -28,22 +27,21 @@ $(document).ready(function() {
 
   // google auth signin
   window.onSignIn = function (googleUser) {
-    // save off the googleUser
-    // TODO: is this secure?
-    gUser = googleUser;
+    // save off user's google profile and id
     // TODO: deal with auth/security concerns re: google id's
     // https://developers.google.com/identity/sign-in/web/people
     // https://developers.google.com/identity/sign-in/web/backend-auth
-    gUserID = gUser.getBasicProfile().getId();
+    gUserProfile = googleUser.getBasicProfile();
+    gUserID = gUserProfile.getId();
 
-    var profile = googleUser.getBasicProfile();
-    var email = profile.getEmail();
-    console.log('Full Name: ' + profile.getName());
-    console.log('Given Name: ' + profile.getGivenName());
-    console.log("Email: " + profile.getEmail());
+    console.log('Full Name: ' + gUserProfile.getName());
+    console.log('Given Name: ' + gUserProfile.getGivenName());
+    console.log("Email: " + gUserProfile.getEmail());
     console.log("signed in!");
   };
 
+
+  // ------------------------ JOIN PAGE -------------------------
   // takes user to the chosen space
   $('#coryHall').on('click', function (e) {
     chosenSpace = 'Cory Hall';
@@ -64,6 +62,12 @@ $(document).ready(function() {
   $('#doeLibrary').on('click', function (e) {
     chosenSpace = 'Doe Library';
     showStudySpace(chosenSpace);
+  });
+
+
+  // ------------------------ CONNECT PAGE ----------------------
+  $('#editPosting').on('click', function (e) {
+    goToEditPosting();
   });
 
 
@@ -146,7 +150,7 @@ $(document).ready(function() {
   // Useful for both createPost and editPost actions.
   // Whenever a user wants to edit a post, it is safe to reuse this function
   function post() {
-    var name = gUser.getBasicProfile().getGivenName();
+    var name = gUserProfile.getGivenName();
     var topic = $('#topic').val();
     var category = $('#category').val();
     var status = $('input[name=status]:checked', '#statusChoice').val();
@@ -174,9 +178,8 @@ $(document).ready(function() {
 
   // Sets the client's google profile
   function setProfile () {
-    email = gUser.getBasicProfile().getEmail();
     console.log("setting profile");
-
+    email = gUserProfile.getEmail();
     socket.emit('check duplicate', {googleUserID: gUserID});
 
     socket.on('duplicate user', function check(info){
@@ -187,17 +190,17 @@ $(document).ready(function() {
       } else {
         // If the email is valid, fade out page
         if (email.indexOf("@berkeley.edu") !== -1) {
-          console.log("yay you're a berkeley student")
+          console.log("user is a berkeley student");
           $loginPage.fadeOut();
           $joinPage.show();
           $loginPage.off('click');
           socket.emit('active user', {googleUserID: gUserID});
         } else {
           alert("Sorry, you're not a Berkeley student!");
+          console.log("user is not a berkeley student");
         }
       }
     });
-
   }
 
   // Prevents input from having injected markup
@@ -265,7 +268,7 @@ $(document).ready(function() {
   // THIS USER wants to connect to SOMEONE ELSE
   function requestConnection(otherUserID, otherUserName) {
     console.log("requesting connection with", otherUserName);
-    var name = gUser.getBasicProfile().getName();
+    var name = gUserProfile.getName();
     socket.emit('send ping', {requestorID: gUserID, requestorName: name, wantedID: otherUserID});
     addToLog("You sent a ping to " + otherUserName + "!");
   }
@@ -277,8 +280,8 @@ $(document).ready(function() {
     var requestorName = info.requestorName;
 
     if (requestorID in spamDictionary == false){
-      var name = gUser.getBasicProfile().getName();
-      addToLog(requestorName + " wants to meet up with you!");
+      var name = gUserProfile.getName();
+      addToLog(requestorName + " wants to meet up with you! You can accept or ignore.");
 
       // unbind listeners first
       $('#acceptPing').off('click');
@@ -311,9 +314,6 @@ $(document).ready(function() {
 
   });
 
-
-
-
   socket.on('receive ack', function receiveAck(info){
     var name = info.name;
     var email = info.email;
@@ -327,16 +327,27 @@ $(document).ready(function() {
     addToLog("Great, " + name + " wants to meet with you! Their email is: " + email);
   });
 
-  //function call to editPost
-  // TODO: finish implementation
-  function editPost(){
-    post();
-    socket.emit('update posting', {googleUser: gUser, googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+  // function call to editPost
+  function goToEditPosting() {
+    console.log("going back to edit posting, removing user's current posting");
+    $connectPage.fadeOut();
+    $joinPage.show();
+    $connectPage.off('click');
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
   }
 
   function addToLog(message) {
+    // format a timestamp
+    var date = new Date();
+    var min = date.getMinutes().toString();
+    min = min.length < 2 ? ("0" + min) : min;
+    var sec = date.getSeconds().toString();
+    sec = sec.length < 2 ? ("0" + sec) : sec;
+    var timestamp = "[" + date.getHours() + ":" + min + ":" + sec + "] ";
+
+    // add new message elem to log
     $('#messages').append(
-      '<li class="list-group-item">' + message + '</li>'
+      '<li class="list-group-item">' + timestamp + message + '</li>'
     );
   }
 
