@@ -135,6 +135,10 @@ ul {
   margin: 10px 0px 10px 0px;
 }
 
+.connect.page #report {
+  margin: 50px 0px 25px 15px;
+}
+
 /* Popup formatting */
 .popup {
   display: none;
