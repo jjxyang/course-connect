@@ -80,7 +80,7 @@ $(document).ready(function() {
     $connectPage.hide();
     $connectPage.off('click');
     $joinPage.fadeToggle();
-    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting});
+    socket.emit('remove user', {googleUserID: gUserID, studySpace: chosenSpace, posting: userPosting, socketID: socket});
   }
   // ------------------------------------------------------------
 
@@ -174,7 +174,7 @@ $(document).ready(function() {
       alert("You've logged in already.");
     } else {
       // If the email is valid, fade out page
-      if (email.indexOf("@berkeley.edu") !== -1) {
+      if (email.indexOf("@berkeley.edu") !== -1 || email.indexOf(".berkeley.edu") !== -1) {
         console.log("user is a berkeley student");
         $loginPage.fadeOut();
         $joinPage.show();
