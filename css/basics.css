@@ -148,43 +148,6 @@ ul {
   margin: 50px 0px 25px 15px;
 }
 
-/* Popup formatting */
-.popup {
-  display: none;
-  position: fixed;
-  padding: 10px;
-  width: 280px;
-  left: 50%;
-  margin-left: -150px;
-  height: 180px;
-  top: 50%;
-  margin-top: -100px;
-  background: #FFF;
-  z-index: 20;
-}
-
-#receivePing:before {
-  position: absolute;
-  content: "";
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: #FFF;
-  z-index: -1;
-}
-
-#receivePing:after {
-  position: fixed;
-  content: "";
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: -2;
-}
-
 /* BS Callout */
 .bs-callout {
     padding: 20px;

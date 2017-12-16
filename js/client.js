@@ -311,13 +311,9 @@ $(document).ready(function() {
     if (requestorID in spamDictionary == false){
       var name = gUserProfile.getName();
       addToLog(requestorName + " wants to meet up with you! You can accept or ignore.");
-
-      // unbind listeners first
-      $('#acceptPing').off('click');
-      $('#ignorePing').off('click');
-
-      // functions for USER to accept or ignore ping from OTHER;
-      $('#acceptPing').on('click', function (e) {
+      
+      var accepted = confirm(requestorName + " wants to meet up with you! Click OK to accept and Cancel to ignore.");
+      if (accepted) {
         // some function in here to add to connectedDictionary... timeout = 100 minutes
         addConnectedDictionary(requestorID);
 
@@ -327,19 +323,11 @@ $(document).ready(function() {
           wantedID: gUserID,
           requestorID: requestorID
         });
-        $('#receivePing').hide();
-      });
-      $('#ignorePing').on('click', function (e) {
-        // some function in here to add to spamDictionary... timeout = 1 minutes
+      } else {
         addSpamDictionary(requestorID);
-
-        $('#receivePing').hide();
-      });
-
-      // display the ping via popup
-      $('#receivePingText').text(requestorName + " wants to meet up with you!");
-      $('#receivePing').show();
-    } // do nothing if requestorID is in spamDictionary
+      }
+    }
+    // do nothing if requestorID is in spamDictionary
   });
 
   socket.on('receive ack', function receiveAck(info){
